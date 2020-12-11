@@ -1,0 +1,6 @@
+/firmware/build/
+/firmware/debug/
+/firmware/disassembly/
+/firmware/dist/
+/firmware/nbproject/
+/~$*
