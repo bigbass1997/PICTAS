@@ -20,6 +20,9 @@ ResVec      code	0x0000
 ; refer to pinout documentation for more information
 ; reminder: all button input pins should be pulled-DOWN (default state is cleared aka 0)
 ;           connect pin to power to set button to a "pressed" state
+#define     PIN_SPI_OUT         LATC,  6
+#define     PIN_SPI_IN          PORTC, 5
+#define     PIN_SPI_CLK         LATC,  4
 
 #define     PIN_N64_DATAIN      PORTD, 1
 #define     PIN_N64_DATAOUT     LATD,  1     ; LAT register is used for writing data out
@@ -70,7 +73,10 @@ FLASH_ADDR_HIGH equ H'18'
 FLASH_ADDR_MID  equ H'19'
 FLASH_ADDR_LOW  equ H'1A'
 
-; 0x1B - 0x5F unused
+SPI_IN          equ H'1B'
+SPI_OUT         equ H'1C'
+
+; 0x1D - 0x5F unused
 
 ; BANK 0  (0x60 - 0xFF)
 ; These bytes are used for temporary storage of data coming from or going to the N64 console.
@@ -109,7 +115,7 @@ Setup:
     ;movlw   B'100000'
     ;movwf   RD0PPS      ; Set SPI1SS    to pin RD0
     movlw   B'011111'
-    movwf   RC5PPS      ; Set SPI1SDO   to pin RC5
+    movwf   RC6PPS      ; Set SPI1SDO   to pin RC6
     movlw   B'011110'
     movwf   RC4PPS      ; Set SPI1SCK   to pin RC4
     movlw   B'010011'
@@ -117,14 +123,19 @@ Setup:
     
     movlw   B'010010'
     movwf   U1RXPPS     ; Set U1RX      to pin RC2
-    movlw   B'010110'
-    movwf   SPI1SDIPPS  ; Set SPI1SDI   to pin RC6
+    movlw   B'010101'
+    movwf   SPI1SDIPPS  ; Set SPI1SDI   to pin RC5
     
     movlb   B'00000000'
     ; === Register Setup ===
     clrf    ZEROS_REG
     setf    ONES_REG
     clrf    UTIL_FLAGS
+    clrf    FLASH_ADDR_HIGH
+    clrf    FLASH_ADDR_MID
+    clrf    FLASH_ADDR_LOW
+    clrf    SPI_IN
+    clrf    SPI_OUT
     
     ; configure I/O ports ; refer to pinout spreadsheet/docs for how these are mapped
     
@@ -143,7 +154,7 @@ Setup:
     movlw   B'00000000'
     movwf   TRISB
     
-    movlw   B'01000100'
+    movlw   B'00100100'
     movwf   TRISC
     
     movlw   B'00000010'
@@ -152,17 +163,25 @@ Setup:
     movlw   B'00000000'
     movwf   TRISE
     
+    ;bcf     SLRCONC, 6
+    ;bcf     SLRCONC, 5
+    bcf     SLRCONC, 4
+    
     BANKSEL N64_STATE_REG1
     clrf    N64_STATE_REG1
     clrf    N64_STATE_REG2
     clrf    N64_STATE_REG3
     clrf    N64_STATE_REG4
     
+    bcf     PIN_SPI_IN
+    bcf     PIN_SPI_OUT
+    bcf     PIN_SPI_CLK
+    bsf     PIN_FLASH_CS
     
     ; === Enable SPI ===
     movlb   B'111101'   ; Bank 61
     clrf    SPI1TWIDTH
-    movlw   D'0'
+    movlw   D'19'
     movwf   SPI1BAUD        ; Set baud rate = ( 64000000 / (2 * (x + 1)) )
     bsf     SPI1CON0, MST
     bsf     SPI1CON0, BMODE
@@ -196,7 +215,43 @@ Setup:
     
     ; Prepare first replay frame
     ;call    RetrieveNextFrame
+    
+    ;call    FlashReadStatus1
+    ;call    FlashWriteEnable
+    ;call    FlashReadStatus1
+    ;call    FlashWriteDisable
+    
+    ;call    FlashReset
+    ;call    FlashReadJEDEC
+    ;call    FlashReadJEDECManual
+    ;goto Start
+    
+    call    FlashWriteEnable
+    call    FlashReadStatus1
+    
+    movlb   B'000001'
+    movlw   H'AA'
+    movwf   H'00'
+    movlw   H'33'
+    movwf   H'01'
+    movlw   H'FF'
+    movwf   H'02'
+    movlw   H'DD'
+    movwf   H'03'
+    
+    call    FlashWritePage
+    call    FlashWriteDisable
+    call    FlashWaitBusy
     call    FlashPrepareRead
+    call    FlashReadNext
+    
+    movffl  H'04', U1TXB
+    movffl  H'05', U1TXB
+    wait D'255'
+    wait D'255'
+    wait D'255'
+    movffl  H'06', U1TXB
+    movffl  H'07', U1TXB
     
     ; === Begin Main Loop ===
 Start:
