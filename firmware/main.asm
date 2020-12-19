@@ -20,10 +20,6 @@ ResVec      code	0x0000
 ; refer to pinout documentation for more information
 ; reminder: all button input pins should be pulled-DOWN (default state is cleared aka 0)
 ;           connect pin to power to set button to a "pressed" state
-#define     PIN_SPI_OUT         LATC,  6
-#define     PIN_SPI_IN          PORTC, 5
-#define     PIN_SPI_CLK         LATC,  4
-
 #define     PIN_N64_DATAIN      PORTD, 1
 #define     PIN_N64_DATAOUT     LATD,  1     ; LAT register is used for writing data out
 #define     TRIS_N64_DATA       TRISD, 1
@@ -73,10 +69,9 @@ FLASH_ADDR_HIGH equ H'18'
 FLASH_ADDR_MID  equ H'19'
 FLASH_ADDR_LOW  equ H'1A'
 
-SPI_IN          equ H'1B'
-SPI_OUT         equ H'1C'
+; 0x1B - 0x5E unused
 
-; 0x1D - 0x5F unused
+JUNK_REG        equ H'5F'
 
 ; BANK 0  (0x60 - 0xFF)
 ; These bytes are used for temporary storage of data coming from or going to the N64 console.
@@ -92,6 +87,11 @@ N64_DATA_TMP3   equ H'64'
 ; This bank is used when writing a 256 byte sector of data to the FLASH memory
 
 ; === CONSTANT BYTES ===
+USB_CMD_PING        equ H'01'
+USB_CMD_DUMP        equ H'02'
+USB_CMD_RUN         equ H'03'
+USB_CMD_WRITE       equ H'AA'
+
 N64_CMD_RESET       equ H'FF'
 N64_CMD_INFO        equ H'00'
 N64_CMD_STATE       equ H'01'
@@ -134,8 +134,6 @@ Setup:
     clrf    FLASH_ADDR_HIGH
     clrf    FLASH_ADDR_MID
     clrf    FLASH_ADDR_LOW
-    clrf    SPI_IN
-    clrf    SPI_OUT
     
     ; configure I/O ports ; refer to pinout spreadsheet/docs for how these are mapped
     
@@ -163,8 +161,8 @@ Setup:
     movlw   B'00000000'
     movwf   TRISE
     
-    ;bcf     SLRCONC, 6
-    ;bcf     SLRCONC, 5
+    bcf     SLRCONC, 6
+    bcf     SLRCONC, 5
     bcf     SLRCONC, 4
     
     BANKSEL N64_STATE_REG1
@@ -173,9 +171,6 @@ Setup:
     clrf    N64_STATE_REG3
     clrf    N64_STATE_REG4
     
-    bcf     PIN_SPI_IN
-    bcf     PIN_SPI_OUT
-    bcf     PIN_SPI_CLK
     bsf     PIN_FLASH_CS
     
     ; === Enable SPI ===
@@ -187,10 +182,8 @@ Setup:
     bsf     SPI1CON0, BMODE
     bsf     SPI1CON1, CKE   ; Clock Edge Select (0 = output data changes on idle to active)
     bcf     SPI1CON1, CKP   ; Clock Polarity Select (0 = idle state of CLK is LOW)
-    ;bcf     SPI1CON1, SSP   ; SS/SC I/O Polarity (1 = active-low)
     bcf     SPI1CON1, SDIP  ; SDI Polarity (0 = active-high)
     bcf     SPI1CON1, SDOP  ; SDO Polarity (0 = active-high)
-    ;bcf     SPI1CON2, SSET  ; Slave Select Enable (0 = SS/CS is driven active while transmit counter > 0)
     bsf     SPI1CON2, TXR   ; 1 = T1FIFO data is required for a transfer
     bsf     SPI1CON2, RXR   ; 1 = data transfer suspended if R1FIFO is full
     movlw   B'0001'
@@ -206,73 +199,163 @@ Setup:
     bcf     U1CON0, U1BRGS  ; normal baud rate formula
     clrf    U1BRGH
     movlw   D'7'
-    movwf   U1BRGL          ; set baud rate to 500,000
+    movwf   U1BRGL          ; set baud rate to 1,000,000
     bsf     U1CON1, U1ON    ; enable UART1
     
     wait D'16'
     
     movlb   B'000000'
     
-    ; Prepare first replay frame
-    ;call    RetrieveNextFrame
-    
-    ;call    FlashReadStatus1
     ;call    FlashWriteEnable
-    ;call    FlashReadStatus1
+    ;call    FlashEraseSector
+    ;call    FlashWaitBusy
+    ;call    FlashWriteEnable
+    
+    ;movlb   B'000001'
+    ;movlw   H'AA'
+    ;movwf   H'00'
+    ;movlw   H'33'
+    ;movwf   H'01'
+    ;movlw   H'49'
+    ;movwf   H'02'
+    ;movlw   H'6A'
+    ;movwf   H'03'
+    
+    ;call    FlashWritePage
     ;call    FlashWriteDisable
+    ;call    FlashWaitBusy
+    ;call    FlashPrepareRead
+    ;call    FlashReadNext
     
-    ;call    FlashReset
-    ;call    FlashReadJEDEC
-    ;call    FlashReadJEDECManual
-    ;goto Start
-    
-    call    FlashWriteEnable
-    call    FlashReadStatus1
-    
-    movlb   B'000001'
-    movlw   H'AA'
-    movwf   H'00'
-    movlw   H'33'
-    movwf   H'01'
-    movlw   H'FF'
-    movwf   H'02'
-    movlw   H'DD'
-    movwf   H'03'
-    
-    call    FlashWritePage
-    call    FlashWriteDisable
-    call    FlashWaitBusy
-    call    FlashPrepareRead
-    call    FlashReadNext
-    
-    movffl  H'04', U1TXB
-    movffl  H'05', U1TXB
-    wait D'255'
-    wait D'255'
-    wait D'255'
-    movffl  H'06', U1TXB
-    movffl  H'07', U1TXB
+    ;movffl  H'04', U1TXB
+    ;movffl  H'05', U1TXB
+    ;wait D'255'
+    ;wait D'255'
+    ;wait D'255'
+    ;movffl  H'06', U1TXB
+    ;movffl  H'07', U1TXB
     
     ; === Begin Main Loop ===
 Start:
+ListenUSBCommands:
+    call    GrabNextUSBRX
+    
+    xorlw   USB_CMD_PING
+    btfsc   STATUS, Z
+    goto    USBRX_Ping
+    
+    xorlw   USB_CMD_DUMP
+    btfsc   STATUS, Z
+    goto    USBRX_Dump
+    
+    xorlw   USB_CMD_RUN
+    btfsc   STATUS, Z
+    goto    USBRX_Run
+    
+    xorlw   USB_CMD_WRITE
+    btfsc   STATUS, Z
+    goto    USBRX_Write
+    
+    
+    movlw   H'00'
+    movffl  WREG, U1TXB
+    goto    ListenUSBCommands
+    
+    ;;;;==================================================================;;;;
+USBRX_Ping: ; 0x01
+    movlw   H'EE'
+    movffl  WREG, U1TXB
+    goto    ListenUSBCommands
+    
+    ;;;;==================================================================;;;;
+USBRX_Dump: ; 0x02 ; This will dump the entire FLASH memory back to host, via USB
+    call    FlashWaitBusy
+    call    FlashPrepareRead
+    BANKSEL ZEROS_REG
+    clrf    FLASH_ADDR_HIGH
+    clrf    FLASH_ADDR_MID
+    clrf    FLASH_ADDR_LOW
+    
+USBRX_Dump_Loop:
+    call    FlashReadNext
+    movffl  WREG, U1TXB
+    ;wait here
+    
+    incfsz  FLASH_ADDR_LOW
+    goto    USBRX_Dump_IncLow
+    goto    USBRX_Dump_Loop
+    
+USBRX_Dump_IncLow:
+    incfsz  FLASH_ADDR_MID
+    goto    USBRX_Dump_IncMid
+    goto    USBRX_Dump_Loop
+    
+USBRX_Dump_IncMid:
+    incfsz  FLASH_ADDR_HIGH
+    goto    USBRX_Dump_End
+    goto    USBRX_Dump_Loop
+    
+USBRX_Dump_End:
+    call    FlashReadEnd
+    
+    goto    ListenUSBCommands
+    
+    ;;;;==================================================================;;;;
+USBRX_Run: ; 0x03
+    movlw   H'DD'
+    movffl  WREG, U1TXB
+    goto    N64Main
+    
+    ;;;;==================================================================;;;;
+USBRX_Write: ; 0xAA
+    clrf    FLASH_ADDR_HIGH
+    clrf    FLASH_ADDR_MID
+    clrf    FLASH_ADDR_LOW
+    
+USBRX_Write_SectorLoop:
+    call    FlashWriteEnable
+    call    FlashEraseSector
+    call    FlashWaitBusy
+    
+    movlw   D'16'
+    movwf   LOOP_COUNT_1
+USBRX_Write_PageLoop:
+    
+    lfsr    1, H'0100'
+    movlw   H'01'
+    movffl  WREG, U1TXB ; Ask if another page available
+    call    GrabNextUSBRX
+    btfss   WREG, 0, 0
+    goto    ListenUSBCommands ; if page not available, then return, else continue
+    
+USBRX_Write_ByteLoop:
+    call    GrabNextUSBRX
+    movffl  WREG, POSTINC1
+    tstfsz  FSR1L, 1   ; skip next if FSR1L == zero
+    goto    USBRX_Write_ByteLoop
+    
+    call    FlashWriteEnable
+    call    FlashWritePage
+    ;;
+    infsnz  FLASH_ADDR_MID  ; increase pointer to location of next page
+    incf    FLASH_ADDR_HIGH ; 
+    
+    decfsz  LOOP_COUNT_1
+    goto    USBRX_Write_PageLoop
+    ; if 16 pages have been written, the next sector must be erased before continuing...
+    
+    goto    USBRX_Write_SectorLoop
+    
+    
+    
+    ;;;;;================================================================;;;;;
+N64Main:
+    ; Prepare first replay frame
+    ;call    RetrieveNextFrame
+N64MainLoop:
     call    ListenForN64
     
-;    movffl  H'18', U1TXB
-;RXLoop:
-;    BANKSEL PIR3
-;    btfss   PIR3, U1RXIF
-;    goto    RXLoop
-;    bcf     PIR3, U1RXIF
-;    BANKSEL U1RXB
-;    movffl  U1RXB, H'18'
-;    
-;    movlw   D'255'
-;    movwf   PAUSE_REG_0
-;    movlw   D'4'
-;    movwf   PAUSE_REG_1
-;    call    Pause2D
-    
-    goto    Start
+    goto    N64MainLoop
     
 ; SUBROUTINES ;
     include "sub-utilities.inc"
@@ -280,6 +363,7 @@ Start:
     
 ListenForN64:
     bsf     TRIS_N64_DATA ; set to input
+    
 WaitForN64DataHigh:
     btfss   PIN_N64_DATAIN
     goto    WaitForN64DataHigh

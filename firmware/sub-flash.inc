@@ -1,39 +1,3 @@
-SPITransfer:
-    BANKSEL SPI_IN
-    movlw   D'8'
-    movwf   LOOP_COUNT_0
-    
-    ; set output, pulse CLK, read input; repeat
-    
-SPIT_Loop:
-    rlcf    SPI_OUT
-    bsf	    PIN_SPI_OUT
-    btfss   STATUS, C
-    bcf	    PIN_SPI_OUT
-    
-    nop
-    nop
-    
-    bsf	    PIN_SPI_CLK
-    nop
-    nop
-    bcf	    PIN_SPI_OUT
-    nop
-    nop
-    
-    bsf	    STATUS, C
-    btfss   PIN_SPI_IN
-    bcf	    STATUS, C
-    rlcf    SPI_IN
-    
-    bcf	    PIN_SPI_CLK
-    
-    decfsz  LOOP_COUNT_0
-    goto    SPIT_Loop
-    
-    return
-    
-    
 FlashReset:
     bcf	    PIN_FLASH_CS
     
@@ -88,46 +52,8 @@ FlashReadJEDEC:
     return
     
     
-FlashReadJEDECManual:
-    BANKSEL SPI_IN
-    
-    bcf	    PIN_FLASH_CS
-    clrf    SPI_OUT
-    call    SPITransfer
-    clrf    SPI_OUT
-    call    SPITransfer
-    clrf    SPI_OUT
-    call    SPITransfer
-    bsf	    PIN_FLASH_CS
-    wait D'255'
-    
-    bcf	    PIN_FLASH_CS
-    
-    movlw   H'9F'
-    movwf   SPI_OUT
-    call    SPITransfer
-    wait D'255'
-    
-    clrf    SPI_OUT
-    call    SPITransfer
-    movffl  SPI_IN, U1TXB
-    clrf    SPI_OUT
-    call    SPITransfer
-    clrf    SPI_OUT
-    call    SPITransfer
-    clrf    SPI_OUT
-    call    SPITransfer
-    clrf    SPI_OUT
-    call    SPITransfer
-    clrf    SPI_OUT
-    call    SPITransfer
-    
-    bsf	    PIN_FLASH_CS
-    
-    return
-    
-    
 FlashReadStatus1:
+    BANKSEL ZEROS_REG
     bcf	    PIN_FLASH_CS
     
     movlw   H'05'
@@ -137,8 +63,8 @@ FlashReadStatus1:
     wait D'255'
     nop
     nop
-    movffl  SPI1RXB, H'1B'
-    movffl  SPI1RXB, H'1B'
+    movffl  SPI1RXB, JUNK_REG
+    movffl  SPI1RXB, JUNK_REG
     
     bsf	    PIN_FLASH_CS
     
@@ -147,6 +73,7 @@ FlashReadStatus1:
     
 ; Queries the FLASH's BUSY bit. Waits until BUSY == 0.
 FlashWaitBusy:
+    BANKSEL ZEROS_REG
     bcf	    PIN_FLASH_CS
     
     movlw   H'05'
@@ -156,7 +83,7 @@ FlashWaitBusy:
     wait D'255'
     nop
     nop
-    movffl  SPI1RXB, H'1B'
+    movffl  SPI1RXB, JUNK_REG
     movffl  SPI1RXB, WREG
     
     btfss   WREG, 0
@@ -183,6 +110,7 @@ FWB_End:
 ; Because memory is only used for TAS replay, memory read
 ; always starts at FLASH address 0x000000.
 FlashPrepareRead:
+    BANKSEL ZEROS_REG
     bcf	    PIN_FLASH_CS
     
     movlw   H'03'
@@ -192,16 +120,16 @@ FlashPrepareRead:
     wait D'255'
     nop
     nop
-    movffl  SPI1RXB, H'1B'
-    movffl  SPI1RXB, H'1B'
+    movffl  SPI1RXB, JUNK_REG
+    movffl  SPI1RXB, JUNK_REG
     
     movffl  WREG, SPI1TXB
     movffl  WREG, SPI1TXB
     wait D'255'
     nop
     nop
-    movffl  SPI1RXB, H'1B'
-    movffl  SPI1RXB, H'1B'
+    movffl  SPI1RXB, JUNK_REG
+    movffl  SPI1RXB, JUNK_REG
     
     ;bsf	    PIN_FLASH_CS
     
@@ -210,36 +138,17 @@ FlashPrepareRead:
     
 ;
 FlashReadNext:
-    ;; WARNING: Test to make sure that /CS going HIGH doesn't disrupt
-    ;; this part of the communication. If the FLASH memory resets its
-    ;; current operation due to this, /CS will need to be performed
-    ;; manually, without the SPI module's help.
-    ;; This wouldn't take up any extra pins, but SC Enable would need to
-    ;; be disabled at bootup.
-    
-    ;; TODO: Read byte by sending dummy data via SPI.
-    ;;	 
-    
-    bcf	    PIN_FLASH_CS
-    
-    movlb   B'000001'
-    movlw   0
-    movffl  WREG, SPI1TXB
     movffl  WREG, SPI1TXB
     wait D'255'
     nop
     nop
-    movffl  SPI1RXB, H'04'
-    movffl  SPI1RXB, H'05'
+    movffl  SPI1RXB, WREG
     
-    movffl  WREG, SPI1TXB
-    movffl  WREG, SPI1TXB
-    wait D'255'
-    nop
-    nop
-    movffl  SPI1RXB, H'06'
-    movffl  SPI1RXB, H'07'
+    return
     
+    
+;
+FlashReadEnd:
     bsf	    PIN_FLASH_CS
     
     return
@@ -284,13 +193,15 @@ FlashWriteDisable:
     
     
 ; Write 256 bytes to the FLASH memory page specified
-; by FLASH_ADDR HIGH, MID, and LOW registers.
+; by FLASH_ADDR_HIGH, MID, and LOW registers.
 ; The bytes that will be written are contained in BANK 1; these bytes
 ; should have already been set before calling this.
+; NOTE: Writing is only able to clear specific bits. To set bits to 1, you
+; must erase bytes first!
 FlashWritePage:
     bcf	    PIN_FLASH_CS
     
-    lfsr 1, H'0100'
+    lfsr    1, H'0100'
     
     ; send instruction and 3 byte address
     BANKSEL FLASH_ADDR_HIGH
@@ -300,16 +211,16 @@ FlashWritePage:
     wait D'255'
     nop
     nop
-    movffl  SPI1RXB, H'1B'
-    movffl  SPI1RXB, H'1B'
+    movffl  SPI1RXB, JUNK_REG
+    movffl  SPI1RXB, JUNK_REG
     
     movffl  FLASH_ADDR_MID, SPI1TXB
     movffl  FLASH_ADDR_LOW, SPI1TXB
     wait D'255'
     nop
     nop
-    movffl  SPI1RXB, H'1B'
-    movffl  SPI1RXB, H'1B'
+    movffl  SPI1RXB, JUNK_REG
+    movffl  SPI1RXB, JUNK_REG
     
     clrf    WREG
     BANKSEL FSR1L
@@ -322,6 +233,35 @@ FWP_Loop:
     
     tstfsz  FSR1L, 1   ; skip next if FSR1L == zero
     goto    FWP_Loop
+    
+    bsf	    PIN_FLASH_CS
+    
+    return
+    
+    
+; Erase 4,096 byte sector specified by FLASH_ADDR_HIGH, MID, and LOW registers.
+; There are 16 pages in 1 sector.
+FlashEraseSector:
+    bcf	    PIN_FLASH_CS
+    
+    BANKSEL FLASH_ADDR_HIGH
+    movlw   H'20'
+    movffl  WREG, SPI1TXB
+    movffl  FLASH_ADDR_HIGH, SPI1TXB
+    wait D'255'
+    nop
+    nop
+    movffl  SPI1RXB, JUNK_REG
+    movffl  SPI1RXB, JUNK_REG
+    
+    movffl  FLASH_ADDR_MID, SPI1TXB
+    movffl  FLASH_ADDR_LOW, SPI1TXB
+    wait D'255'
+    nop
+    nop
+    movffl  SPI1RXB, JUNK_REG
+    movffl  SPI1RXB, JUNK_REG
+    
     
     bsf	    PIN_FLASH_CS
     

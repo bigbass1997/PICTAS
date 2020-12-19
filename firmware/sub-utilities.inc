@@ -115,33 +115,41 @@ DDTB_End:
 RetrieveNextFrame:
     movlw   0xFE
     movffl  WREG, U1TXB
-RNF_Loop1:
     BANKSEL PIR3
+RNF_Loop1:
     btfss   PIR3, U1RXIF
     goto    RNF_Loop1
     bcf     PIR3, U1RXIF
     movffl  U1RXB, N64_STATE_REG1
     
 RNF_Loop2:
-    BANKSEL PIR3
     btfss   PIR3, U1RXIF
     goto    RNF_Loop2
     bcf     PIR3, U1RXIF
     movffl  U1RXB, N64_STATE_REG2
     
 RNF_Loop3:
-    BANKSEL PIR3
     btfss   PIR3, U1RXIF
     goto    RNF_Loop3
     bcf     PIR3, U1RXIF
     movffl  U1RXB, N64_STATE_REG3
     
 RNF_Loop4:
-    BANKSEL PIR3
     btfss   PIR3, U1RXIF
     goto    RNF_Loop4
     bcf     PIR3, U1RXIF
     movffl  U1RXB, N64_STATE_REG4
     
     BANKSEL ZEROS_REG
+    return
+    
+    
+GrabNextUSBRX:
+    BANKSEL PIR3
+GNUSB_Loop:
+    btfss   PIR3, U1RXIF
+    goto    GNUSB_Loop
+    bcf     PIR3, U1RXIF
+    movffl  U1RXB, WREG
+    
     return
