@@ -109,38 +109,26 @@ DDTB_End:
     return  ; If byte was valid, cycle should be: 4, 5/16, leaving 11 cycles free
     
     
-; Requests the next frame of inputs from the host, then stores it for the next
-; state command. Eventually this will support more than just one N64 controller
+; Retrieves the next frame from FLASH memory.
+; Eventually this will support more than just one N64 controller
 ; worth of input.
 RetrieveNextFrame:
-    movlw   0xFE
-    movffl  WREG, U1TXB
-    BANKSEL PIR3
-RNF_Loop1:
-    btfss   PIR3, U1RXIF
-    goto    RNF_Loop1
-    bcf     PIR3, U1RXIF
-    movffl  U1RXB, N64_STATE_REG1
+    movlw   0
+    call FlashReadNext
+    movffl  WREG, N64_STATE_REG1
     
-RNF_Loop2:
-    btfss   PIR3, U1RXIF
-    goto    RNF_Loop2
-    bcf     PIR3, U1RXIF
-    movffl  U1RXB, N64_STATE_REG2
+    movlw   0
+    call FlashReadNext
+    movffl  WREG, N64_STATE_REG2
     
-RNF_Loop3:
-    btfss   PIR3, U1RXIF
-    goto    RNF_Loop3
-    bcf     PIR3, U1RXIF
-    movffl  U1RXB, N64_STATE_REG3
+    movlw   0
+    call FlashReadNext
+    movffl  WREG, N64_STATE_REG3
     
-RNF_Loop4:
-    btfss   PIR3, U1RXIF
-    goto    RNF_Loop4
-    bcf     PIR3, U1RXIF
-    movffl  U1RXB, N64_STATE_REG4
+    movlw   0
+    call FlashReadNext
+    movffl  WREG, N64_STATE_REG4
     
-    BANKSEL ZEROS_REG
     return
     
     

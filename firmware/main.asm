@@ -239,25 +239,31 @@ Setup:
 Start:
 ListenUSBCommands:
     call    GrabNextUSBRX
+    BANKSEL JUNK_REG
+    movwf   JUNK_REG
     
     xorlw   USB_CMD_PING
     btfsc   STATUS, Z
     goto    USBRX_Ping
+    movf    JUNK_REG, 0
     
     xorlw   USB_CMD_DUMP
     btfsc   STATUS, Z
     goto    USBRX_Dump
+    movf    JUNK_REG, 0
     
     xorlw   USB_CMD_RUN
     btfsc   STATUS, Z
     goto    USBRX_Run
+    movf    JUNK_REG, 0
     
     xorlw   USB_CMD_WRITE
     btfsc   STATUS, Z
     goto    USBRX_Write
+    movf    JUNK_REG, 0
     
     
-    movlw   H'00'
+    movlw   H'FF'
     movffl  WREG, U1TXB
     goto    ListenUSBCommands
     
@@ -280,18 +286,20 @@ USBRX_Dump_Loop:
     call    FlashReadNext
     movffl  WREG, U1TXB
     ;wait here
+    wait D'255'
+    wait D'63'
     
-    incfsz  FLASH_ADDR_LOW
+    infsnz  FLASH_ADDR_LOW
     goto    USBRX_Dump_IncLow
     goto    USBRX_Dump_Loop
     
 USBRX_Dump_IncLow:
-    incfsz  FLASH_ADDR_MID
+    infsnz  FLASH_ADDR_MID
     goto    USBRX_Dump_IncMid
     goto    USBRX_Dump_Loop
     
 USBRX_Dump_IncMid:
-    incfsz  FLASH_ADDR_HIGH
+    infsnz  FLASH_ADDR_HIGH
     goto    USBRX_Dump_End
     goto    USBRX_Dump_Loop
     
@@ -324,18 +332,21 @@ USBRX_Write_PageLoop:
     lfsr    1, H'0100'
     movlw   H'01'
     movffl  WREG, U1TXB ; Ask if another page available
+    movlw   0
     call    GrabNextUSBRX
-    btfss   WREG, 0, 0
+    xorlw   H'01'
+    btfss   STATUS, Z
     goto    ListenUSBCommands ; if page not available, then return, else continue
     
 USBRX_Write_ByteLoop:
     call    GrabNextUSBRX
     movffl  WREG, POSTINC1
-    tstfsz  FSR1L, 1   ; skip next if FSR1L == zero
+    tstfsz  FSR1L   ; skip next if FSR1L == zero
     goto    USBRX_Write_ByteLoop
     
     call    FlashWriteEnable
     call    FlashWritePage
+    call    FlashWaitBusy
     ;;
     infsnz  FLASH_ADDR_MID  ; increase pointer to location of next page
     incf    FLASH_ADDR_HIGH ; 
@@ -351,7 +362,8 @@ USBRX_Write_ByteLoop:
     ;;;;;================================================================;;;;;
 N64Main:
     ; Prepare first replay frame
-    ;call    RetrieveNextFrame
+    call    FlashPrepareRead
+    call    RetrieveNextFrame
 N64MainLoop:
     call    ListenForN64
     
@@ -461,7 +473,7 @@ N64Loop01:  ; Do 0x01 (state) command here
     call    SendN64Byte
     call    SendN64StopBit
     
-    ;call    RetrieveNextFrame
+    call    RetrieveNextFrame
     
     goto ContinueLFNL
     
