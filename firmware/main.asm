@@ -237,10 +237,12 @@ Setup:
     
     ; === Begin Main Loop ===
 Start:
+    ;goto    N64Main
 ListenUSBCommands:
     call    GrabNextUSBRX
     BANKSEL JUNK_REG
     movwf   JUNK_REG
+    
     
     xorlw   USB_CMD_PING
     btfsc   STATUS, Z
@@ -340,6 +342,7 @@ USBRX_Write_PageLoop:
     
 USBRX_Write_ByteLoop:
     call    GrabNextUSBRX
+    movffl  WREG, U1TXB
     movffl  WREG, POSTINC1
     tstfsz  FSR1L   ; skip next if FSR1L == zero
     goto    USBRX_Write_ByteLoop
