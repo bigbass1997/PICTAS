@@ -237,7 +237,7 @@ Setup:
     
     ; === Begin Main Loop ===
 Start:
-    ;goto    N64Main
+    ;goto    N64Main  ;; if uncommented, this bypasses USB commands ; useful for testing basic controller connection
 ListenUSBCommands:
     call    GrabNextUSBRX
     BANKSEL JUNK_REG
@@ -422,6 +422,11 @@ LFNL_DecodeLoop:
     btfsc   STATUS, Z
     goto N64Loop00
     
+    movf    N64_CMD_REG, 0
+    xorlw   N64_CMD_RESET
+    btfsc   STATUS, Z
+    goto N64LoopFF
+    
     ; if this point is reached, no commands were identified. Wait a short time in case of any additional data
     movlw   D'224'
     movwf   PAUSE_REG_0
@@ -432,8 +437,8 @@ LFNL_DecodeLoop:
     
 N64LoopFF:  ; Do 0xFF (reset/info) command here
     BANKSEL ZEROS_REG
-    clrf    N64_STATE_REG3 ; resets x-axis
-    clrf    N64_STATE_REG4 ; resets y-axis
+    ;clrf    N64_STATE_REG3 ; resets x-axis
+    ;clrf    N64_STATE_REG4 ; resets y-axis
     
     ; continue to N64Loop00...
     
