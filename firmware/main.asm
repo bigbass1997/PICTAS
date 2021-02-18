@@ -6,7 +6,7 @@
     CONFIG DEBUG = ON
     CONFIG LVP = ON
     CONFIG MCLRE = EXTMCLR
-    CONFIG MVECEN = OFF
+    CONFIG MVECEN = ON ; Eanbles Interrupt Vector Table ; IVTBASE + 2*(vector number)
     
     CONFIG RSTOSC = HFINTOSC_64MHZ
     
@@ -15,13 +15,26 @@
 ResVec      code	0x0000
     goto    Setup
     
+IOCVec	    code	0x0016	; (0x0008 + (2 * 7))
+    dw	    (0x0116>>2)
+    
+	    code	0x0400
+; === Look at bottom of file for ISR routines ===
     
 ; === DEFINE PINS (text substitutions) ===
 ; refer to pinout documentation for more information
 ; reminder: all button input pins should be pulled-DOWN (default state is cleared aka 0)
 ;           connect pin to power to set button to a "pressed" state
+#define	    PIN_NES_DATA2	LATA,  4
+#define	    PIN_NES_CLK2	PORTA, 3
+
+#define	    PIN_NES_DATA1	LATA,  2
+#define	    PIN_NES_CLK1	PORTA, 1
+
+#define	    PIN_NES_LATCH	PORTA, 0    ; Latch pins for each controller are connected at console-level
+
 #define     PIN_N64_DATAIN      PORTD, 1
-#define     PIN_N64_DATAOUT     LATD,  1     ; LAT register is used for writing data out
+#define     PIN_N64_DATAOUT     LATD,  1    ; LAT register is used for writing data out
 #define     TRIS_N64_DATA       TRISD, 1
 
 #define     PIN_FLASH_CS        LATD,  0
@@ -69,7 +82,14 @@ FLASH_ADDR_HIGH equ H'18'
 FLASH_ADDR_MID  equ H'19'
 FLASH_ADDR_LOW  equ H'1A'
 
-; 0x1B - 0x5E unused
+; NES Controller Data
+NES_STATE_REG1	equ H'1B'
+NES_STATE_REG2	equ H'1C'
+
+NES_COUNTER1	equ H'1D' ; Counters are used to tell when an input is finished being relayed to the NES
+NES_COUNTER2	equ H'1E'
+
+; 0x1F - 0x5E unused
 
 JUNK_REG        equ H'5F'
 
@@ -89,7 +109,8 @@ N64_DATA_TMP3   equ H'64'
 ; === CONSTANT BYTES ===
 USB_CMD_PING        equ H'01'
 USB_CMD_DUMP        equ H'02'
-USB_CMD_RUN         equ H'03'
+USB_CMD_RUN_N64     equ H'03'
+USB_CMD_RUN_NES     equ H'04'
 USB_CMD_WRITE       equ H'AA'
 
 N64_CMD_RESET       equ H'FF'
@@ -146,7 +167,7 @@ Setup:
     clrf    ANSELE
     
     ; 0 is output, 1 is input
-    movlw   B'00000000'
+    movlw   B'00001011'
     movwf   TRISA
     
     movlw   B'00000000'
@@ -165,18 +186,25 @@ Setup:
     bcf     SLRCONC, 5
     bcf     SLRCONC, 4
     
-    BANKSEL N64_STATE_REG1
+    BANKSEL ZEROS_REG
     clrf    N64_STATE_REG1
     clrf    N64_STATE_REG2
     clrf    N64_STATE_REG3
     clrf    N64_STATE_REG4
+    
+    clrf    NES_STATE_REG1
+    clrf    NES_STATE_REG2
+    clrf    NES_COUNTER1
+    clrf    NES_COUNTER2
+    bsf	    PIN_NES_DATA1
+    bsf	    PIN_NES_DATA2
     
     bsf     PIN_FLASH_CS
     
     ; === Enable SPI ===
     movlb   B'111101'   ; Bank 61
     clrf    SPI1TWIDTH
-    movlw   D'19'
+    movlw   D'4'
     movwf   SPI1BAUD        ; Set baud rate = ( 64000000 / (2 * (x + 1)) )
     bsf     SPI1CON0, MST
     bsf     SPI1CON0, BMODE
@@ -203,6 +231,18 @@ Setup:
     bsf     U1CON1, U1ON    ; enable UART1
     
     wait D'16'
+    
+    
+    ; === Enable Interrupts ===
+    bcf	    INTCON0, IPEN_INTCON0   ; Priority is unnecessary, make sure it's left off
+    
+    bcf	    PIR0, IOCIF
+    bsf	    PIE0, IOCIE	    ; Interrupt-on-Change enabled
+    bsf	    INTCON0, GIE    ; Global Interrupt Enable bit
+    
+    ; Specific IOC pins are configured as needed.
+    ; This is done to avoid accidental interrupts on irrelevant consoles.
+    
     
     movlb   B'000000'
     
@@ -237,7 +277,7 @@ Setup:
     
     ; === Begin Main Loop ===
 Start:
-    ;goto    N64Main  ;; if uncommented, this bypasses USB commands ; useful for testing basic controller connection
+    ;goto    NESMain  ;; if uncommented, this bypasses USB commands ; useful for testing basic controller connection
 ListenUSBCommands:
     call    GrabNextUSBRX
     BANKSEL JUNK_REG
@@ -254,9 +294,14 @@ ListenUSBCommands:
     goto    USBRX_Dump
     movf    JUNK_REG, 0
     
-    xorlw   USB_CMD_RUN
+    xorlw   USB_CMD_RUN_N64
     btfsc   STATUS, Z
-    goto    USBRX_Run
+    goto    USBRX_Run_N64
+    movf    JUNK_REG, 0
+    
+    xorlw   USB_CMD_RUN_NES
+    btfsc   STATUS, Z
+    goto    USBRX_Run_NES
     movf    JUNK_REG, 0
     
     xorlw   USB_CMD_WRITE
@@ -311,10 +356,15 @@ USBRX_Dump_End:
     goto    ListenUSBCommands
     
     ;;;;==================================================================;;;;
-USBRX_Run: ; 0x03
+USBRX_Run_N64: ; 0x03
     movlw   H'DD'
     movffl  WREG, U1TXB
     goto    N64Main
+    
+USBRX_Run_NES: ; 0x04
+    movlw   H'DD'
+    movffl  WREG, U1TXB
+    goto    NESMain
     
     ;;;;==================================================================;;;;
 USBRX_Write: ; 0xAA
@@ -361,20 +411,20 @@ USBRX_Write_ByteLoop:
     goto    USBRX_Write_SectorLoop
     
     
+; SUBROUTINES ;
+    include "sub-utilities.inc"
+    include "sub-flash.inc"
     
-    ;;;;;================================================================;;;;;
+    
+;;;;;====================== N64 Main Logic ======================;;;;;
 N64Main:
     ; Prepare first replay frame
     call    FlashPrepareRead
-    call    RetrieveNextFrame
+    call    RetrieveNextFrame_N64
 N64MainLoop:
     call    ListenForN64
     
     goto    N64MainLoop
-    
-; SUBROUTINES ;
-    include "sub-utilities.inc"
-    include "sub-flash.inc"
     
 ListenForN64:
     bsf     TRIS_N64_DATA ; set to input
@@ -481,7 +531,7 @@ N64Loop01:  ; Do 0x01 (state) command here
     call    SendN64Byte
     call    SendN64StopBit
     
-    call    RetrieveNextFrame
+    call    RetrieveNextFrame_N64
     
     goto ContinueLFNL
     
@@ -489,8 +539,88 @@ N64Loop01:  ; Do 0x01 (state) command here
 ContinueLFNL:
     return
     
-; INTERRUPT SUBROUTINES ;
-    ; N/A
     
+;;;;;====================== NES Main Logic ======================;;;;;
+NESMain:
+    call    FlashPrepareRead
+    
+    BANKSEL INTCON0
+    bcf	    INTCON0, GIE    ; Temporarily disable global interrupt bit
+    
+    BANKSEL IOCAP
+    bsf	    IOCAP, 0	; Pos edge LATCH
+    bsf	    IOCAN, 1	; Neg edge NES_CLK1
+    bsf	    IOCAN, 3	; Neg edge NES_CLK2
+    
+    clrf    IOCAF	; safety clear IOC port A
+    
+    BANKSEL PIE0
+    bsf	    PIE0, IOCIE	    ; Interrupt-on-Change enabled
+    BANKSEL INTCON0
+    bsf	    INTCON0, GIE    ; Re-enabling global interrupt bit
+    
+NESMain_Loop:
+    ;; TODO loop to check counter register(s); if 8 loops completed, then reset and retrieve next frame
+    
+    goto    NESMain_Loop
+    
+; INTERRUPT SUBROUTINES ;
+
+IOCISR	    code	0x0116	;; check all IOCxF flag bits
+    BANKSEL IOCAF
+    btfsc   IOCAF, 0
+    call    IOCISR_AF0
+    
+    btfsc   IOCAF, 1
+    call    IOCISR_AF1
+    
+    btfsc   IOCAF, 3
+    call    IOCISR_AF3
+    
+    retfie
+    
+IOCISR_AF0:
+    call    RetrieveNextFrame_NES
+    movlb   0
+    
+    bcf	    STATUS, C
+    rlcf    NES_STATE_REG1, 1
+    bsf	    PIN_NES_DATA1
+    btfss   STATUS, C
+    bcf	    PIN_NES_DATA1
+    
+    bcf	    STATUS, C
+    rlcf    NES_STATE_REG2, 1
+    bsf	    PIN_NES_DATA2
+    btfss   STATUS, C
+    bcf	    PIN_NES_DATA2
+    
+    BANKSEL IOCAF
+    bcf	    IOCAF, 0
+    return
+    
+IOCISR_AF1:
+    movlb   0
+    bcf	    STATUS, C
+    rlcf    NES_STATE_REG1, 1
+    bsf	    PIN_NES_DATA1
+    btfss   STATUS, C
+    bcf	    PIN_NES_DATA1
+    
+    BANKSEL IOCAF
+    bcf	    IOCAF, 1
+    return
+    
+IOCISR_AF3:
+    movlb   0
+    bcf	    STATUS, C
+    rlcf    NES_STATE_REG2, 1
+    bsf	    PIN_NES_DATA2
+    btfss   STATUS, C
+    bcf	    PIN_NES_DATA2
+    
+    BANKSEL IOCAF
+    bcf	    IOCAF, 3
+    return
     
     end

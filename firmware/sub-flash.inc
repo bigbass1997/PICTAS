@@ -139,7 +139,7 @@ FlashPrepareRead:
 ;
 FlashReadNext:
     movffl  WREG, SPI1TXB
-    wait D'128'
+    wait D'40'
     nop
     nop
     movffl  SPI1RXB, WREG
