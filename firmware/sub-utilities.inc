@@ -138,7 +138,6 @@ RetrieveNextFrame_NES:
     movlw   0
     call FlashReadNext
     movffl  WREG, NES_STATE_REG1
-    
     movffl  ONES_REG, NES_STATE_REG2 ;; TODO implement 2nd controller detection
     
     ; TESTING ONLY: ;

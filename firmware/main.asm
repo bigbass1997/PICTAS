@@ -204,7 +204,7 @@ Setup:
     ; === Enable SPI ===
     movlb   B'111101'   ; Bank 61
     clrf    SPI1TWIDTH
-    movlw   D'4'
+    movlw   D'2'
     movwf   SPI1BAUD        ; Set baud rate = ( 64000000 / (2 * (x + 1)) )
     bsf     SPI1CON0, MST
     bsf     SPI1CON0, BMODE
@@ -580,8 +580,11 @@ IOCISR	    code	0x0116	;; check all IOCxF flag bits
     retfie
     
 IOCISR_AF0:
-    call    RetrieveNextFrame_NES
+    ;call    RetrieveNextFrame
     movlb   0
+    call FlashReadNext
+    movffl  WREG, NES_STATE_REG1
+    movffl  ONES_REG, NES_STATE_REG2 ;; TODO implement 2nd controller detection
     
     bcf	    STATUS, C
     rlcf    NES_STATE_REG1, 1

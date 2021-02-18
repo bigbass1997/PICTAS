@@ -139,14 +139,24 @@ FlashPrepareRead:
 ;
 FlashReadNext:
     movffl  WREG, SPI1TXB
-    wait D'40'
+    wait D'13'
     nop
     nop
     movffl  SPI1RXB, WREG
     
     return
+
+;
+FlashReadNextNES:
+    movffl  WREG, SPI1TXB
+    movffl  WREG, SPI1TXB
+    wait D'12'
+    nop
+    nop
+    movffl  SPI1RXB, NES_STATE_REG1
+    movffl  SPI1RXB, NES_STATE_REG2
     
-    
+    return
 ;
 FlashReadEnd:
     bsf	    PIN_FLASH_CS
