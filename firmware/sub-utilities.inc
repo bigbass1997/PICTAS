@@ -151,6 +151,7 @@ RetrieveNextFrame_NES:
 GrabNextUSBRX:
     BANKSEL PIR3
 GNUSB_Loop:
+    movffl  PIR3, WREG
     btfss   PIR3, U1RXIF
     goto    GNUSB_Loop
     bcf     PIR3, U1RXIF

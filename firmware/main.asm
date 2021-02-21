@@ -16,7 +16,10 @@ ResVec      code	0x0000
     goto    Setup
     
 IOCVec	    code	0x0016	; (0x0008 + (2 * 7))
-    dw	    (0x0116>>2)
+    dw	    (0x0100>>2)
+
+TMR0Vec	    code	0x0046	; (0x0008 + (2 * 31))
+    dw	    (0x0300>>2)
     
 	    code	0x0400
 ; === Look at bottom of file for ISR routines ===
@@ -62,7 +65,8 @@ TX_DATA2        equ H'0D' ; Data to be transmitted to the console, used as "doub
 
 UTIL_FLAGS      equ H'0E' ; Utility Flags, initalized with 0x00
 ; <7> If set, determined byte is invalid, decoding should halt
-; <6:0> Unused
+; <6> If set, no new NES latches should be accepted
+; <5:0> Unused
 
 ; Pause Clock
 PAUSE_REG_0     equ H'10'
@@ -85,11 +89,12 @@ FLASH_ADDR_LOW  equ H'1A'
 ; NES Controller Data
 NES_STATE_REG1	equ H'1B'
 NES_STATE_REG2	equ H'1C'
+NES_STATE_TMP1	equ H'1D'
+NES_STATE_TMP2	equ H'1E'
+NES_COUNT1	equ H'1F'
+NES_COUNT2	equ H'20'
 
-NES_COUNTER1	equ H'1D' ; Counters are used to tell when an input is finished being relayed to the NES
-NES_COUNTER2	equ H'1E'
-
-; 0x1F - 0x5E unused
+; 0x21 - 0x5E unused
 
 JUNK_REG        equ H'5F'
 
@@ -192,10 +197,8 @@ Setup:
     clrf    N64_STATE_REG3
     clrf    N64_STATE_REG4
     
-    clrf    NES_STATE_REG1
-    clrf    NES_STATE_REG2
-    clrf    NES_COUNTER1
-    clrf    NES_COUNTER2
+    setf    NES_STATE_REG1
+    setf    NES_STATE_REG2
     bsf	    PIN_NES_DATA1
     bsf	    PIN_NES_DATA2
     
@@ -232,12 +235,30 @@ Setup:
     
     wait D'16'
     
+    ; === Setup Timer0 ===
+    BANKSEL T0CON1
+    movlw   B'01111011'
+    movwf   T0CON1
+    ; <7:5> sets clock source to HFINTOSC
+    ;   <4> syncs timer to system clock (4 * instruction cycle clock)
+    ; <3:0> sets prescaler to 1:2048 ratio ; (2048 / 4 = 512 instructions for 1 count)
+					   ; (512 / 16 =  32 microSeconds for 1 count)
+    
+    movlw   D'250'
+    movwf   TMR0H	    ; sets timer period to 250 counts ; (250 * (32us/count) = 8ms)
+    ; enable when ready to start ; bsf T0CON0, 7 ;
+    
     
     ; === Enable Interrupts ===
+    BANKSEL INTCON0
     bcf	    INTCON0, IPEN_INTCON0   ; Priority is unnecessary, make sure it's left off
     
+    BANKSEL PIR0
     bcf	    PIR0, IOCIF
     bsf	    PIE0, IOCIE	    ; Interrupt-on-Change enabled
+    bcf	    PIR3, TMR0IF
+    bsf	    PIE3, TMR0IE    ; Timer0 Interrupt enabled
+    BANKSEL INTCON0
     bsf	    INTCON0, GIE    ; Global Interrupt Enable bit
     
     ; Specific IOC pins are configured as needed.
@@ -560,13 +581,21 @@ NESMain:
     bsf	    INTCON0, GIE    ; Re-enabling global interrupt bit
     
 NESMain_Loop:
-    ;; TODO loop to check counter register(s); if 8 loops completed, then reset and retrieve next frame
+    ;; loop until interrupt breaks the loop or device resets
     
     goto    NESMain_Loop
     
 ; INTERRUPT SUBROUTINES ;
 
 IOCISR	    code	0x0116	;; check all IOCxF flag bits
+    ;movlb   B'000000'
+    ;btfsc   UTIL_FLAGS, 6
+    ;goto    IOCISR_End
+    
+    ;bsf	    UTIL_FLAGS, 6
+    ;BANKSEL T0CON0
+    ;bsf	    T0CON0, 7
+    
     BANKSEL IOCAF
     btfsc   IOCAF, 0
     call    IOCISR_AF0
@@ -582,33 +611,52 @@ IOCISR	    code	0x0116	;; check all IOCxF flag bits
 IOCISR_AF0:
     ;call    RetrieveNextFrame
     movlb   0
-    call FlashReadNext
-    movffl  WREG, NES_STATE_REG1
-    movffl  ONES_REG, NES_STATE_REG2 ;; TODO implement 2nd controller detection
+    movlw   H'FF'
+    ;call FlashReadNext
+    ;movffl  WREG, NES_STATE_REG1
+    ;movffl  ONES_REG, NES_STATE_REG2 ;; TODO implement 2nd controller detection
+    call FlashReadNextNES
     
-    bcf	    STATUS, C
+    bsf	    STATUS, C
     rlcf    NES_STATE_REG1, 1
     bsf	    PIN_NES_DATA1
     btfss   STATUS, C
     bcf	    PIN_NES_DATA1
+    rlcf    NES_STATE_TMP1, 1
     
-    bcf	    STATUS, C
+    bsf	    STATUS, C
     rlcf    NES_STATE_REG2, 1
     bsf	    PIN_NES_DATA2
     btfss   STATUS, C
     bcf	    PIN_NES_DATA2
+    rlcf    NES_STATE_TMP2, 1
+    
+    movlw   D'7'
+    movwf   NES_COUNT1
+    movwf   NES_COUNT2
+    
+    BANKSEL T0CON0
+    bsf	    T0CON0, 7
     
     BANKSEL IOCAF
     bcf	    IOCAF, 0
+    bcf	    IOCAP, 0
     return
     
 IOCISR_AF1:
     movlb   0
-    bcf	    STATUS, C
+    
+    wait D'32'
+    
+    bsf	    STATUS, C
     rlcf    NES_STATE_REG1, 1
     bsf	    PIN_NES_DATA1
     btfss   STATUS, C
     bcf	    PIN_NES_DATA1
+    rlcf    NES_STATE_TMP1, 1
+    
+    dcfsnz  NES_COUNT1
+    movff   NES_STATE_TMP1, NES_STATE_REG1
     
     BANKSEL IOCAF
     bcf	    IOCAF, 1
@@ -616,14 +664,44 @@ IOCISR_AF1:
     
 IOCISR_AF3:
     movlb   0
-    bcf	    STATUS, C
+    
+    wait D'32'
+    
+    bsf	    STATUS, C
     rlcf    NES_STATE_REG2, 1
     bsf	    PIN_NES_DATA2
     btfss   STATUS, C
     bcf	    PIN_NES_DATA2
+    rlcf    NES_STATE_TMP2, 1
+    
+    dcfsnz  NES_COUNT2
+    movff   NES_STATE_TMP2, NES_STATE_REG2
     
     BANKSEL IOCAF
     bcf	    IOCAF, 3
     return
+    
+IOCISR_End:
+    BANKSEL IOCAF
+    bcf	    IOCAF, 0
+    bcf	    IOCAF, 1
+    bcf	    IOCAF, 3
+    retfie
+    
+    
+TMR0ISR	    code	0x0300	;; Timer0 has completed	
+    ;movlb   B'000000'
+    ;bcf	    UTIL_FLAGS, 6
+    BANKSEL IOCAP
+    bcf	    IOCAF, 0
+    bsf	    IOCAP, 0
+    
+    BANKSEL T0CON0
+    bcf	    T0CON0, 7
+    
+    BANKSEL PIR3
+    bcf	    PIR3, TMR0IF
+    
+    retfie
     
     end
