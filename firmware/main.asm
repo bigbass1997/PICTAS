@@ -609,6 +609,10 @@ IOCISR	    code	0x0116	;; check all IOCxF flag bits
     retfie
     
 IOCISR_AF0:
+    ;BANKSEL IOCAP
+    ;btfss   IOCAP, 0
+    ;return
+    
     ;call    RetrieveNextFrame
     movlb   0
     movlw   H'FF'
@@ -616,20 +620,22 @@ IOCISR_AF0:
     ;movffl  WREG, NES_STATE_REG1
     ;movffl  ONES_REG, NES_STATE_REG2 ;; TODO implement 2nd controller detection
     call FlashReadNextNES
+    movff   NES_STATE_REG1, NES_STATE_TMP1
+    movff   NES_STATE_REG2, NES_STATE_TMP2
     
     bsf	    STATUS, C
     rlcf    NES_STATE_REG1, 1
     bsf	    PIN_NES_DATA1
     btfss   STATUS, C
     bcf	    PIN_NES_DATA1
-    rlcf    NES_STATE_TMP1, 1
+    ;rlcf    NES_STATE_TMP1, 1
     
     bsf	    STATUS, C
     rlcf    NES_STATE_REG2, 1
     bsf	    PIN_NES_DATA2
     btfss   STATUS, C
     bcf	    PIN_NES_DATA2
-    rlcf    NES_STATE_TMP2, 1
+    ;rlcf    NES_STATE_TMP2, 1
     
     movlw   D'7'
     movwf   NES_COUNT1
@@ -646,17 +652,17 @@ IOCISR_AF0:
 IOCISR_AF1:
     movlb   0
     
-    wait D'32'
+    wait D'64'
     
     bsf	    STATUS, C
     rlcf    NES_STATE_REG1, 1
     bsf	    PIN_NES_DATA1
     btfss   STATUS, C
     bcf	    PIN_NES_DATA1
-    rlcf    NES_STATE_TMP1, 1
+    ;rlcf    NES_STATE_TMP1, 1
     
     dcfsnz  NES_COUNT1
-    movff   NES_STATE_TMP1, NES_STATE_REG1
+    call    IOCISR_ResetCount1
     
     BANKSEL IOCAF
     bcf	    IOCAF, 1
@@ -665,17 +671,17 @@ IOCISR_AF1:
 IOCISR_AF3:
     movlb   0
     
-    wait D'32'
+    wait D'64'
     
     bsf	    STATUS, C
     rlcf    NES_STATE_REG2, 1
     bsf	    PIN_NES_DATA2
     btfss   STATUS, C
     bcf	    PIN_NES_DATA2
-    rlcf    NES_STATE_TMP2, 1
+    ;rlcf    NES_STATE_TMP2, 1
     
     dcfsnz  NES_COUNT2
-    movff   NES_STATE_TMP2, NES_STATE_REG2
+    call    IOCISR_ResetCount2
     
     BANKSEL IOCAF
     bcf	    IOCAF, 3
@@ -687,6 +693,20 @@ IOCISR_End:
     bcf	    IOCAF, 1
     bcf	    IOCAF, 3
     retfie
+    
+IOCISR_ResetCount1:
+    movffl  NES_STATE_TMP1, U1TXB
+    movff   NES_STATE_TMP1, NES_STATE_REG1
+    movlw   D'8'
+    movwf   NES_COUNT1
+    return
+    
+IOCISR_ResetCount2:
+    movffl  NES_STATE_TMP2, U1TXB
+    movff   NES_STATE_TMP2, NES_STATE_REG2
+    movlw   D'8'
+    movwf   NES_COUNT2
+    return
     
     
 TMR0ISR	    code	0x0300	;; Timer0 has completed	
