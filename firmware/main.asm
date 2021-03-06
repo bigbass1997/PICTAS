@@ -138,8 +138,6 @@ Setup:
     
     ; === Peripheral Pin Select ===
     movlb   B'111010'   ; Bank 58
-    ;movlw   B'100000'
-    ;movwf   RD0PPS      ; Set SPI1SS    to pin RD0
     movlw   B'011111'
     movwf   RC6PPS      ; Set SPI1SDO   to pin RC6
     movlw   B'011110'
@@ -588,14 +586,6 @@ NESMain_Loop:
 ; INTERRUPT SUBROUTINES ;
 
 IOCISR	    code	0x0116	;; check all IOCxF flag bits
-    ;movlb   B'000000'
-    ;btfsc   UTIL_FLAGS, 6
-    ;goto    IOCISR_End
-    
-    ;bsf	    UTIL_FLAGS, 6
-    ;BANKSEL T0CON0
-    ;bsf	    T0CON0, 7
-    
     BANKSEL IOCAF
     btfsc   IOCAF, 0
     call    IOCISR_AF0
@@ -609,16 +599,8 @@ IOCISR	    code	0x0116	;; check all IOCxF flag bits
     retfie
     
 IOCISR_AF0:
-    ;BANKSEL IOCAP
-    ;btfss   IOCAP, 0
-    ;return
-    
-    ;call    RetrieveNextFrame
     movlb   0
     movlw   H'FF'
-    ;call FlashReadNext
-    ;movffl  WREG, NES_STATE_REG1
-    ;movffl  ONES_REG, NES_STATE_REG2 ;; TODO implement 2nd controller detection
     call FlashReadNextNES
     movff   NES_STATE_REG1, NES_STATE_TMP1
     movff   NES_STATE_REG2, NES_STATE_TMP2
@@ -628,14 +610,12 @@ IOCISR_AF0:
     bsf	    PIN_NES_DATA1
     btfss   STATUS, C
     bcf	    PIN_NES_DATA1
-    ;rlcf    NES_STATE_TMP1, 1
     
     bsf	    STATUS, C
     rlcf    NES_STATE_REG2, 1
     bsf	    PIN_NES_DATA2
     btfss   STATUS, C
     bcf	    PIN_NES_DATA2
-    ;rlcf    NES_STATE_TMP2, 1
     
     movlw   D'7'
     movwf   NES_COUNT1
@@ -652,14 +632,13 @@ IOCISR_AF0:
 IOCISR_AF1:
     movlb   0
     
-    wait D'64'
+    wait D'32'
     
     bsf	    STATUS, C
     rlcf    NES_STATE_REG1, 1
     bsf	    PIN_NES_DATA1
     btfss   STATUS, C
     bcf	    PIN_NES_DATA1
-    ;rlcf    NES_STATE_TMP1, 1
     
     dcfsnz  NES_COUNT1
     call    IOCISR_ResetCount1
@@ -671,14 +650,13 @@ IOCISR_AF1:
 IOCISR_AF3:
     movlb   0
     
-    wait D'64'
+    wait D'32'
     
     bsf	    STATUS, C
     rlcf    NES_STATE_REG2, 1
     bsf	    PIN_NES_DATA2
     btfss   STATUS, C
     bcf	    PIN_NES_DATA2
-    ;rlcf    NES_STATE_TMP2, 1
     
     dcfsnz  NES_COUNT2
     call    IOCISR_ResetCount2
@@ -710,8 +688,6 @@ IOCISR_ResetCount2:
     
     
 TMR0ISR	    code	0x0300	;; Timer0 has completed	
-    ;movlb   B'000000'
-    ;bcf	    UTIL_FLAGS, 6
     BANKSEL IOCAP
     bcf	    IOCAF, 0
     bsf	    IOCAP, 0

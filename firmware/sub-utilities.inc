@@ -131,22 +131,6 @@ RetrieveNextFrame_N64:
     
     return
     
-; Retrieves the next NES frame from FLASH memory.
-; Eventually this will support more than just one NES controller
-; worth of input.
-RetrieveNextFrame_NES:
-    movlw   0
-    call FlashReadNext
-    movffl  WREG, NES_STATE_REG1
-    movffl  ONES_REG, NES_STATE_REG2 ;; TODO implement 2nd controller detection
-    
-    ; TESTING ONLY: ;
-    ;movlw B'10101101'
-    ;movffl WREG, NES_STATE_REG1
-    ;movffl ONES_REG, NES_STATE_REG2
-    
-    return
-    
     
 GrabNextUSBRX:
     BANKSEL PIR3

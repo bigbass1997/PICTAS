@@ -131,8 +131,6 @@ FlashPrepareRead:
     movffl  SPI1RXB, JUNK_REG
     movffl  SPI1RXB, JUNK_REG
     
-    ;bsf	    PIN_FLASH_CS
-    
     return
     
     
