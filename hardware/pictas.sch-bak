@@ -1,9 +1,9 @@
 EESchema Schematic File Version 4
 EELAYER 30 0
 EELAYER END
-$Descr A4 11693 8268
+$Descr A3 16535 11693
 encoding utf-8
-Sheet 1 1
+Sheet 1 2
 Title ""
 Date ""
 Rev ""
@@ -13,336 +13,652 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-$Comp
-L pictas:PIC18LF47K42 U?
-U 1 1 5FCC6CF9
-P 8875 3600
-F 0 "U?" H 8875 4965 50  0000 C CNN
-F 1 "PIC18LF47K42" H 8875 4874 50  0000 C CNN
-F 2 "" H 8925 3500 50  0001 C CNN
-F 3 "" H 8925 3500 50  0001 C CNN
-	1    8875 3600
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x05 J?
-U 1 1 5FCC9332
-P 10475 2600
-F 0 "J?" H 10555 2642 50  0000 L CNN
-F 1 "ICSProgrammer" H 10555 2551 50  0000 L CNN
-F 2 "" H 10475 2600 50  0001 C CNN
-F 3 "~" H 10475 2600 50  0001 C CNN
-	1    10475 2600
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	8075 2500 7975 2500
-Wire Wire Line
-	7975 2500 7975 2100
-Wire Wire Line
-	7975 2100 10175 2100
-Wire Wire Line
-	10175 2100 10175 2400
-Wire Wire Line
-	10075 2700 10075 3400
-Wire Wire Line
-	10075 3400 9675 3400
-Wire Wire Line
-	9675 3500 10175 3500
-Wire Wire Line
-	10175 3500 10175 2800
-NoConn ~ 9675 3250
-NoConn ~ 9675 3150
-NoConn ~ 9675 3050
-NoConn ~ 9675 2950
-NoConn ~ 9675 2850
-NoConn ~ 9675 2750
-NoConn ~ 9675 3700
-NoConn ~ 9675 3800
-NoConn ~ 9675 3900
-NoConn ~ 9675 4000
-NoConn ~ 9675 4600
-NoConn ~ 9675 4700
-NoConn ~ 8075 4250
-NoConn ~ 8075 4150
-NoConn ~ 8075 4000
-NoConn ~ 8075 3900
-NoConn ~ 8075 3500
-NoConn ~ 8075 3400
-NoConn ~ 8075 3300
-NoConn ~ 8075 3150
-NoConn ~ 8075 3050
-NoConn ~ 8075 2950
-NoConn ~ 8075 2850
-NoConn ~ 8075 2750
-NoConn ~ 8075 2650
-$Comp
-L Device:R R?
-U 1 1 5FCCCDA2
-P 7725 2500
-F 0 "R?" V 7518 2500 50  0000 C CNN
-F 1 "10k" V 7609 2500 50  0000 C CNN
-F 2 "" V 7655 2500 50  0001 C CNN
-F 3 "~" H 7725 2500 50  0001 C CNN
-	1    7725 2500
-	0    1    1    0   
-$EndComp
-Wire Wire Line
-	7875 2500 7975 2500
-Connection ~ 7975 2500
-Wire Wire Line
-	7475 2500 7575 2500
-$Comp
-L Connector_Generic:Conn_01x03 J?
-U 1 1 5FCCDEB1
-P 5475 2300
-F 0 "J?" V 5439 2112 50  0000 R CNN
-F 1 "N64 Controller" V 5348 2112 50  0000 R CNN
-F 2 "" H 5475 2300 50  0001 C CNN
-F 3 "~" H 5475 2300 50  0001 C CNN
-	1    5475 2300
-	0    -1   -1   0   
-$EndComp
-Wire Wire Line
-	5575 3750 5575 2500
-Wire Wire Line
-	5475 2500 5475 4700
-$Comp
-L Device:R R?
-U 1 1 5FCD18E4
-P 7475 4000
-F 0 "R?" H 7405 3954 50  0000 R CNN
-F 1 "10k" H 7405 4045 50  0000 R CNN
-F 2 "" V 7405 4000 50  0001 C CNN
-F 3 "~" H 7475 4000 50  0001 C CNN
-	1    7475 4000
-	1    0    0    1   
-$EndComp
-Wire Wire Line
-	5475 4700 7475 4700
-Wire Wire Line
-	7475 4150 7475 4700
-Connection ~ 7475 4700
-Wire Wire Line
-	7475 4700 8075 4700
-Wire Wire Line
-	7475 3850 7475 3650
-Wire Wire Line
-	7475 3650 8075 3650
-$Comp
-L Connector_Generic:Conn_01x06 J?
-U 1 1 5FCD6411
-P 4325 2300
-F 0 "J?" V 4300 1900 50  0000 R CNN
-F 1 "TTL to USB" V 4225 1900 50  0000 R CNN
-F 2 "" H 4325 2300 50  0001 C CNN
-F 3 "~" H 4325 2300 50  0001 C CNN
-	1    4325 2300
-	0    -1   -1   0   
-$EndComp
-Wire Wire Line
-	4525 2500 4525 3750
-Wire Wire Line
-	4525 3750 5575 3750
-Wire Wire Line
-	4425 2500 4425 4350
-Wire Wire Line
-	4425 4350 8075 4350
-Wire Wire Line
-	8075 4450 4325 4450
-Wire Wire Line
-	4325 4450 4325 2500
-NoConn ~ 4225 2500
-NoConn ~ 4125 2500
-Text Label 5475 2500 3    50   ~ 0
-DATA
-Text Label 5575 2500 3    50   ~ 0
-GND
-Text Label 4625 2500 3    50   ~ 0
-3.3V
-Text Label 4525 2500 3    50   ~ 0
-GND
-Text Label 4325 2500 3    50   ~ 0
--->USB_RX
-Text Label 8075 4350 2    50   ~ 0
--->U1RX
-Text Label 8075 4450 2    50   ~ 0
-<--U1TX
-Text Label 4425 2500 3    50   ~ 0
-<--USB_TX
-Wire Wire Line
-	9675 2600 10275 2600
-Wire Wire Line
-	9675 2500 10275 2500
-Wire Wire Line
-	10175 2400 10275 2400
-Wire Wire Line
-	10175 2800 10275 2800
-Wire Wire Line
-	10275 2700 10075 2700
-$Comp
-L Connector_Generic:Conn_01x04 J?
-U 1 1 5FCF0B13
-P 4425 2100
-F 0 "J?" V 4350 2400 50  0000 L CNN
-F 1 "USB Port" V 4425 2400 50  0000 L CNN
-F 2 "" H 4425 2100 50  0001 C CNN
-F 3 "~" H 4425 2100 50  0001 C CNN
-	1    4425 2100
-	0    1    1    0   
-$EndComp
-Wire Wire Line
-	4525 1900 4525 1525
-Wire Wire Line
-	4425 1900 4425 1525
-Wire Wire Line
-	4325 1900 4325 1525
-Wire Wire Line
-	4225 1900 4225 1525
-Text Label 4225 1900 1    50   ~ 0
-5V_HOST
-Text Label 4325 1900 1    50   ~ 0
-D-
-Text Label 4425 1900 1    50   ~ 0
+$Sheet
+S 1775 9850 825  825 
+U 60387ACD
+F0 "USB Interface" 50
+F1 "usb-interface.sch" 50
+F2 "UART_RX" O R 2600 10350 50 
+F3 "UART_TX" I R 2600 10450 50 
+F4 "D+" B L 1775 10350 50 
+F5 "D-" B L 1775 10450 50 
+F6 "VDD" I R 2600 10050 50 
+F7 "VSS" I R 2600 10150 50 
+$EndSheet
+Text Label 1025 10350 0    50   ~ 0
 D+
-Text Label 4525 1900 1    50   ~ 0
-GND_HOST
-Wire Notes Line
-	4025 1450 4025 3000
-Wire Notes Line
-	4025 3000 4700 3000
-Wire Notes Line
-	4700 3000 4700 1450
-Wire Notes Line
-	4700 1450 4025 1450
-Text Notes 4000 1425 0    50   ~ 0
-TTL to USB Adapter
+Text Label 1025 10450 0    50   ~ 0
+D-
+Text Label 1025 10550 0    50   ~ 0
+USB_5V
+Wire Wire Line
+	1025 10550 1400 10550
+Wire Wire Line
+	1025 10250 1300 10250
+Text Label 1025 10250 0    50   ~ 0
+GND
 $Comp
-L Connector_Generic:Conn_01x03 J?
-U 1 1 5FD04561
-P 5475 2100
-F 0 "J?" V 5347 1912 50  0000 R CNN
-F 1 "N64 Controller" V 5438 1912 50  0000 R CNN
-F 2 "" H 5475 2100 50  0001 C CNN
-F 3 "~" H 5475 2100 50  0001 C CNN
-	1    5475 2100
-	0    -1   1    0   
+L Connector_Generic:Conn_01x04 J8
+U 1 1 5FCF0B13
+P 825 10350
+F 0 "J8" H 675 10700 50  0000 L CNN
+F 1 "USB Port" H 525 10600 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical" H 825 10350 50  0001 C CNN
+F 3 "~" H 825 10350 50  0001 C CNN
+	1    825  10350
+	-1   0    0    -1  
 $EndComp
 Wire Wire Line
-	5475 1900 5475 1525
-Text Label 5475 1900 1    50   ~ 0
-DATA
-Text Label 5575 1900 1    50   ~ 0
+	10775 9600 9975 9600
+Wire Wire Line
+	10775 10225 10775 9600
+Wire Wire Line
+	8475 10225 10775 10225
+Wire Wire Line
+	8475 10700 8475 10225
+Wire Wire Line
+	8675 10700 8475 10700
+Wire Wire Line
+	10675 9700 9975 9700
+Wire Wire Line
+	10675 10900 10675 9700
+Wire Wire Line
+	9675 10900 10675 10900
+Wire Wire Line
+	10575 9800 9975 9800
+Wire Wire Line
+	10575 10800 10575 9800
+Wire Wire Line
+	9675 10800 10575 10800
+Wire Wire Line
+	3900 9100 8375 9100
+Connection ~ 3900 9100
+Wire Wire Line
+	3900 10900 3900 9100
+Wire Wire Line
+	8675 10900 3900 10900
+Wire Wire Line
+	3800 9000 6800 9000
+Connection ~ 3800 9000
+Wire Wire Line
+	3800 11100 3800 9000
+Wire Wire Line
+	9775 11100 3800 11100
+Wire Wire Line
+	9775 10600 9775 11100
+Wire Wire Line
+	9675 10600 9775 10600
+NoConn ~ 8675 10800
+NoConn ~ 9675 10700
+$Comp
+L pictas-rescue:W25Q128JVS_PinAligned-Memory_Flash U2
+U 1 1 5FD3A853
+P 9175 10750
+F 0 "U2" H 9175 10450 50  0000 C CNN
+F 1 "W25Q128JVS_PinAligned" H 9175 11076 50  0000 C CNN
+F 2 "Package_SO:SOIC-8_5.275x5.275mm_P1.27mm" H 9175 10750 50  0001 C CNN
+F 3 "http://www.winbond.com/resource-files/w25q32jv%20revg%2003272018%20plus.pdf" H 9175 10750 50  0001 C CNN
+	1    9175 10750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6800 7850 6800 9000
+Connection ~ 6800 9000
+Wire Wire Line
+	9975 7850 10075 7850
+Wire Wire Line
+	9975 7950 10175 7950
+Wire Wire Line
+	6800 9000 8375 9000
+Wire Wire Line
+	6800 7850 7875 7850
+$Comp
+L Device:R R5
+U 1 1 5FCCCDA2
+P 8025 7850
+F 0 "R5" V 7818 7850 50  0000 C CNN
+F 1 "10k" V 7909 7850 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" V 7955 7850 50  0001 C CNN
+F 3 "~" H 8025 7850 50  0001 C CNN
+	1    8025 7850
+	0    1    1    0   
+$EndComp
+NoConn ~ 8375 8650
+NoConn ~ 8375 8750
+NoConn ~ 8375 8850
+NoConn ~ 8375 9250
+NoConn ~ 8375 9350
+NoConn ~ 8375 9500
+NoConn ~ 8375 9600
+NoConn ~ 9975 9350
+NoConn ~ 9975 9250
+NoConn ~ 9975 9150
+NoConn ~ 9975 9050
+NoConn ~ 9975 8100
+NoConn ~ 9975 8200
+NoConn ~ 9975 8300
+NoConn ~ 9975 8400
+NoConn ~ 9975 8500
+NoConn ~ 9975 8600
+Wire Wire Line
+	9975 8850 10375 8850
+Wire Wire Line
+	10275 8750 9975 8750
+$Comp
+L Connector_Generic:Conn_01x05 J7
+U 1 1 5FCC9332
+P 9175 6925
+F 0 "J7" V 9100 6525 50  0000 L CNN
+F 1 "ICSP" V 9175 6475 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical" H 9175 6925 50  0001 C CNN
+F 3 "~" H 9175 6925 50  0001 C CNN
+	1    9175 6925
+	0    -1   -1   0   
+$EndComp
+$Comp
+L pictas:PIC18LF47K42 U1
+U 1 1 5FCC6CF9
+P 9175 8950
+F 0 "U1" H 9175 10315 50  0000 C CNN
+F 1 "PIC18LF47K42" H 9175 10224 50  0000 C CNN
+F 2 "Package_DIP:DIP-40_W15.24mm" H 9225 8850 50  0001 C CNN
+F 3 "" H 9225 8850 50  0001 C CNN
+	1    9175 8950
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x03 J3
+U 1 1 5FCCDEB1
+P 5850 725
+F 0 "J3" V 5814 537 50  0000 R CNN
+F 1 "N64_CNT1" V 5723 537 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 5850 725 50  0001 C CNN
+F 3 "~" H 5850 725 50  0001 C CNN
+	1    5850 725 
+	0    -1   -1   0   
+$EndComp
+Text Label 5850 925  3    50   ~ 0
+N64_DATA1
+Text Label 5950 925  3    50   ~ 0
 GND
 Wire Wire Line
-	5575 1525 5575 1900
-Wire Notes Line
-	5275 2725 5650 2725
-Wire Notes Line
-	5650 2725 5650 1450
-Wire Notes Line
-	5275 2725 5275 1450
-Connection ~ 7475 3650
+	8175 7850 8275 7850
 Wire Wire Line
-	7475 2500 7475 3650
+	8275 7850 8275 7525
 Wire Wire Line
-	4625 2500 4625 3650
+	8275 7525 8975 7525
 Wire Wire Line
-	4625 3650 6550 3650
-Wire Notes Line
-	5275 1450 5650 1450
-Text Notes 5250 1425 0    50   ~ 0
-N64 Port 1
-Connection ~ 5575 3750
+	8975 7525 8975 7125
+Connection ~ 8275 7850
 Wire Wire Line
-	5575 3750 6650 3750
+	8275 7850 8375 7850
+Wire Wire Line
+	10075 7850 10075 7525
+Wire Wire Line
+	10075 7525 9075 7525
+Wire Wire Line
+	9075 7525 9075 7125
+Wire Wire Line
+	10175 7950 10175 7425
+Wire Wire Line
+	10175 7425 9175 7425
+Wire Wire Line
+	9175 7425 9175 7125
+Wire Wire Line
+	10275 7325 9275 7325
+Wire Wire Line
+	9275 7325 9275 7125
+Wire Wire Line
+	10275 7325 10275 8750
+Wire Wire Line
+	10375 7225 9375 7225
+Wire Wire Line
+	9375 7225 9375 7125
+Wire Wire Line
+	10375 7225 10375 8850
+Wire Wire Line
+	5750 925  5750 1650
+Text Label 5750 925  3    50   ~ 0
+3.3V
 $Comp
-L Memory_Flash:W25Q128JVS_PinAligned U?
-U 1 1 5FD3A853
-P 8875 5400
-F 0 "U?" H 8875 5817 50  0000 C CNN
-F 1 "W25Q128JVS_PinAligned" H 8875 5726 50  0000 C CNN
-F 2 "Package_SO:SOIC-8_5.23x5.23mm_P1.27mm" H 8875 5400 50  0001 C CNN
-F 3 "http://www.winbond.com/resource-files/w25q32jv%20revg%2003272018%20plus.pdf" H 8875 5400 50  0001 C CNN
-	1    8875 5400
-	1    0    0    -1  
-$EndComp
-NoConn ~ 9375 5350
-NoConn ~ 8375 5450
-Wire Wire Line
-	8075 4600 7975 4600
-Wire Wire Line
-	7975 4600 7975 5250
-Wire Wire Line
-	7975 5250 8375 5250
-NoConn ~ 9675 4150
-Wire Wire Line
-	9375 5250 9475 5250
-Wire Wire Line
-	9475 5250 9475 5750
-Wire Wire Line
-	9475 5750 6550 5750
-Wire Wire Line
-	6550 5750 6550 3650
-Connection ~ 6550 3650
-Wire Wire Line
-	6550 3650 7475 3650
-Wire Wire Line
-	8375 5550 6650 5550
-Wire Wire Line
-	6650 5550 6650 3750
-Connection ~ 6650 3750
-Wire Wire Line
-	6650 3750 8075 3750
-Wire Wire Line
-	9375 5450 10075 5450
-Wire Wire Line
-	10075 5450 10075 4450
-Wire Wire Line
-	10075 4450 9675 4450
-Wire Wire Line
-	9375 5550 10175 5550
-Wire Wire Line
-	10175 5550 10175 4350
-Wire Wire Line
-	10175 4350 9675 4350
-Wire Wire Line
-	8375 5350 8250 5350
-Wire Wire Line
-	8250 5350 8250 4875
-Wire Wire Line
-	8250 4875 10275 4875
-Wire Wire Line
-	10275 4875 10275 4250
-Wire Wire Line
-	10275 4250 9675 4250
-NoConn ~ 5375 2500
-NoConn ~ 5375 1900
-$Comp
-L MCU_Microchip_PIC18:PIC18LF4550-IP-PinAligned U?
-U 1 1 5FD5A9AA
-P 2575 3850
-F 0 "U?" H 2575 5367 50  0000 C CNN
-F 1 "PIC18LF4550-IP-PinAligned" H 2575 5276 50  0000 C CNN
-F 2 "Package_DIP:DIP-40_W15.24mm" H 2575 4050 50  0001 C CIN
-F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/39760d.pdf" H 2575 3600 50  0001 C CNN
-	1    2575 3850
-	1    0    0    -1  
+L Connector_Generic:Conn_01x03 J4
+U 1 1 6038ED4F
+P 6625 725
+F 0 "J4" V 6589 537 50  0000 R CNN
+F 1 "N64_CNT2" V 6498 537 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 6625 725 50  0001 C CNN
+F 3 "~" H 6625 725 50  0001 C CNN
+	1    6625 725 
+	0    -1   -1   0   
 $EndComp
 Wire Wire Line
-	3875 4600 4075 4600
+	6725 1650 6725 1250
 Wire Wire Line
-	4075 4600 4075 4350
+	6625 925  6625 1550
+Text Label 6625 925  3    50   ~ 0
+N64_DATA2
+Text Label 6725 925  3    50   ~ 0
+GND
 Wire Wire Line
-	4075 4350 4225 4350
+	6525 925  6525 1650
+Text Label 6525 925  3    50   ~ 0
+3.3V
+Text Label 3300 925  3    50   ~ 0
+GND
+Text Label 3400 925  3    50   ~ 0
+NES_CLK1
+Text Label 3500 925  3    50   ~ 0
+NES_LATCH
+Text Label 3600 925  3    50   ~ 0
+NES_DATA1
+Text Label 3700 925  3    50   ~ 0
+NES_5V
+Text Label 3800 925  3    50   ~ 0
+NES_D31
+Text Label 3900 925  3    50   ~ 0
+NES_D41
+$Comp
+L Connector_Generic:Conn_01x07 J2
+U 1 1 6039D3A6
+P 4775 725
+F 0 "J2" V 4739 337 50  0000 R CNN
+F 1 "NES_CNT2" V 4648 337 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x07_P2.54mm_Vertical" H 4775 725 50  0001 C CNN
+F 3 "~" H 4775 725 50  0001 C CNN
+	1    4775 725 
+	0    -1   -1   0   
+$EndComp
 Wire Wire Line
-	3875 4500 3975 4500
+	4475 925  4475 1650
 Wire Wire Line
-	3975 4500 3975 4450
+	4575 925  4575 1650
 Wire Wire Line
-	3975 4450 4225 4450
+	4675 925  4675 1650
 Wire Wire Line
-	3875 3650 4225 3650
+	4775 925  4775 1650
 Wire Wire Line
-	3875 3750 4225 3750
+	4875 925  4875 1650
+Wire Wire Line
+	4975 925  4975 1650
+Wire Wire Line
+	5075 925  5075 1650
+Text Label 4475 925  3    50   ~ 0
+GND
+Text Label 4575 925  3    50   ~ 0
+NES_CLK2
+Text Label 4675 925  3    50   ~ 0
+NES_LATCH
+Text Label 4775 925  3    50   ~ 0
+NES_DATA2
+Text Label 4875 925  3    50   ~ 0
+NES_5V
+Text Label 4975 925  3    50   ~ 0
+NES_D32
+Text Label 5075 925  3    50   ~ 0
+NES_D42
+Entry Wire Line
+	3900 1650 3800 1750
+Entry Wire Line
+	3800 1650 3700 1750
+Entry Wire Line
+	3700 1650 3600 1750
+Entry Wire Line
+	3600 1650 3500 1750
+Entry Wire Line
+	3500 1650 3400 1750
+Entry Wire Line
+	3400 1650 3300 1750
+Entry Wire Line
+	3300 1650 3200 1750
+Entry Wire Line
+	5075 1650 4975 1750
+Entry Wire Line
+	4975 1650 4875 1750
+Entry Wire Line
+	4875 1650 4775 1750
+Entry Wire Line
+	4775 1650 4675 1750
+Entry Wire Line
+	4675 1650 4575 1750
+Entry Wire Line
+	4575 1650 4475 1750
+Entry Wire Line
+	4475 1650 4375 1750
+Entry Wire Line
+	8275 1650 8175 1750
+Entry Wire Line
+	8175 1650 8075 1750
+Entry Wire Line
+	8075 1650 7975 1750
+Entry Wire Line
+	7500 1650 7400 1750
+Entry Wire Line
+	7400 1650 7300 1750
+Entry Wire Line
+	7300 1650 7200 1750
+$Comp
+L Connector_Generic:Conn_01x03 J5
+U 1 1 603CF55A
+P 7400 725
+F 0 "J5" V 7364 537 50  0000 R CNN
+F 1 "N64_CNT3" V 7273 537 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 7400 725 50  0001 C CNN
+F 3 "~" H 7400 725 50  0001 C CNN
+	1    7400 725 
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	7500 1650 7500 1250
+Wire Wire Line
+	7400 925  7400 1550
+Text Label 7400 925  3    50   ~ 0
+N64_DATA3
+Text Label 7500 925  3    50   ~ 0
+GND
+Wire Wire Line
+	7300 925  7300 1650
+Text Label 7300 925  3    50   ~ 0
+3.3V
+Entry Wire Line
+	6725 1650 6625 1750
+Entry Wire Line
+	6625 1650 6525 1750
+Entry Wire Line
+	6525 1650 6425 1750
+$Comp
+L Connector_Generic:Conn_01x03 J6
+U 1 1 603D166E
+P 8175 725
+F 0 "J6" V 8139 537 50  0000 R CNN
+F 1 "N64_CNT4" V 8048 537 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 8175 725 50  0001 C CNN
+F 3 "~" H 8175 725 50  0001 C CNN
+	1    8175 725 
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	8275 1650 8275 1250
+Wire Wire Line
+	8175 925  8175 1550
+Text Label 8175 925  3    50   ~ 0
+N64_DATA4
+Text Label 8275 925  3    50   ~ 0
+GND
+Wire Wire Line
+	8075 925  8075 1650
+Text Label 8075 925  3    50   ~ 0
+3.3V
+Entry Wire Line
+	5950 1650 5850 1750
+Entry Wire Line
+	5850 1650 5750 1750
+Entry Wire Line
+	5750 1650 5650 1750
+Wire Wire Line
+	3900 925  3900 1650
+Wire Wire Line
+	3800 925  3800 1650
+Wire Wire Line
+	3700 925  3700 1650
+Wire Wire Line
+	3600 925  3600 1650
+Wire Wire Line
+	3500 925  3500 1650
+Wire Wire Line
+	3400 925  3400 1650
+Wire Wire Line
+	3300 925  3300 1650
+$Comp
+L Connector_Generic:Conn_01x07 J1
+U 1 1 603906D5
+P 3600 725
+F 0 "J1" V 3564 337 50  0000 R CNN
+F 1 "NES_CNT1" V 3473 337 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x07_P2.54mm_Vertical" H 3600 725 50  0001 C CNN
+F 3 "~" H 3600 725 50  0001 C CNN
+	1    3600 725 
+	0    -1   -1   0   
+$EndComp
+Wire Bus Line
+	1100 6500 7100 6500
+Wire Bus Line
+	1100 1750 1100 6500
+Entry Wire Line
+	7100 7900 7200 8000
+Wire Wire Line
+	7200 8000 8375 8000
+NoConn ~ 8375 8500
+Entry Wire Line
+	7100 8000 7200 8100
+Wire Wire Line
+	7200 8100 8375 8100
+Entry Wire Line
+	7100 8100 7200 8200
+Wire Wire Line
+	7200 8200 8375 8200
+Entry Wire Line
+	7100 8200 7200 8300
+Wire Wire Line
+	7200 8300 8375 8300
+Entry Wire Line
+	7100 8300 7200 8400
+Wire Wire Line
+	7200 8400 8375 8400
+Entry Wire Line
+	7100 9850 7200 9950
+$Comp
+L Device:R_Small R1
+U 1 1 6043A3B5
+P 5900 1400
+F 0 "R1" H 5959 1446 50  0000 L CNN
+F 1 "10k" H 5959 1355 50  0000 L CNN
+F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" H 5900 1400 50  0001 C CNN
+F 3 "~" H 5900 1400 50  0001 C CNN
+	1    5900 1400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5950 1650 5950 1250
+Wire Wire Line
+	5850 925  5850 1550
+Wire Wire Line
+	5900 1500 5900 1550
+Wire Wire Line
+	5900 1550 5850 1550
+Connection ~ 5850 1550
+Wire Wire Line
+	5850 1550 5850 1650
+Wire Wire Line
+	5900 1300 5900 1250
+Wire Wire Line
+	5900 1250 5950 1250
+Connection ~ 5950 1250
+Wire Wire Line
+	5950 1250 5950 925 
+$Comp
+L Device:R_Small R2
+U 1 1 60459E60
+P 6675 1400
+F 0 "R2" H 6734 1446 50  0000 L CNN
+F 1 "10k" H 6734 1355 50  0000 L CNN
+F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" H 6675 1400 50  0001 C CNN
+F 3 "~" H 6675 1400 50  0001 C CNN
+	1    6675 1400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6675 1500 6675 1550
+Wire Wire Line
+	6675 1300 6675 1250
+$Comp
+L Device:R_Small R3
+U 1 1 6045D15D
+P 7450 1400
+F 0 "R3" H 7509 1446 50  0000 L CNN
+F 1 "10k" H 7509 1355 50  0000 L CNN
+F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" H 7450 1400 50  0001 C CNN
+F 3 "~" H 7450 1400 50  0001 C CNN
+	1    7450 1400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7450 1500 7450 1550
+Wire Wire Line
+	7450 1300 7450 1250
+$Comp
+L Device:R_Small R4
+U 1 1 6046086A
+P 8225 1400
+F 0 "R4" H 8284 1446 50  0000 L CNN
+F 1 "10k" H 8284 1355 50  0000 L CNN
+F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" H 8225 1400 50  0001 C CNN
+F 3 "~" H 8225 1400 50  0001 C CNN
+	1    8225 1400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8225 1500 8225 1550
+Wire Wire Line
+	8225 1300 8225 1250
+Wire Wire Line
+	8225 1250 8275 1250
+Connection ~ 8275 1250
+Wire Wire Line
+	8275 1250 8275 925 
+Wire Wire Line
+	8225 1550 8175 1550
+Connection ~ 8175 1550
+Wire Wire Line
+	8175 1550 8175 1650
+Wire Wire Line
+	7450 1550 7400 1550
+Connection ~ 7400 1550
+Wire Wire Line
+	7400 1550 7400 1650
+Wire Wire Line
+	7450 1250 7500 1250
+Connection ~ 7500 1250
+Wire Wire Line
+	7500 1250 7500 925 
+Wire Wire Line
+	6675 1250 6725 1250
+Connection ~ 6725 1250
+Wire Wire Line
+	6725 1250 6725 925 
+Wire Wire Line
+	6675 1550 6625 1550
+Connection ~ 6625 1550
+Wire Wire Line
+	6625 1550 6625 1650
+Wire Wire Line
+	7200 9950 8375 9950
+Text Label 8375 9950 2    50   ~ 0
+N64_DATA1
+Text Label 8375 8000 2    50   ~ 0
+NES_LATCH
+Text Label 8375 8100 2    50   ~ 0
+NES_CLK1
+Text Label 8375 8200 2    50   ~ 0
+NES_DATA1
+Text Label 8375 8300 2    50   ~ 0
+NES_CLK2
+Text Label 8375 8400 2    50   ~ 0
+NES_DATA2
+Wire Bus Line
+	11250 6500 7100 6500
+Connection ~ 7100 6500
+Wire Wire Line
+	1025 10350 1775 10350
+Wire Wire Line
+	1025 10450 1775 10450
+Wire Wire Line
+	2600 10050 2800 10050
+Wire Wire Line
+	2800 10050 2800 9000
+Wire Wire Line
+	2800 9000 3800 9000
+Wire Wire Line
+	2900 9100 2900 10150
+Wire Wire Line
+	2900 10150 2600 10150
+Wire Wire Line
+	2900 9100 3900 9100
+Wire Wire Line
+	8375 9700 4750 9700
+Wire Wire Line
+	4750 9700 4750 10350
+Wire Wire Line
+	4750 10350 2600 10350
+Wire Wire Line
+	2600 10450 4850 10450
+Wire Wire Line
+	4850 10450 4850 9800
+Wire Wire Line
+	4850 9800 8375 9800
+Text Label 8375 9700 2    50   ~ 0
+U1RX
+Text Label 8375 9800 2    50   ~ 0
+U1TX
+Wire Wire Line
+	8675 10600 8575 10600
+Wire Wire Line
+	8575 10600 8575 10325
+Wire Wire Line
+	8575 10325 10875 10325
+Wire Wire Line
+	10875 10325 10875 9500
+Wire Wire Line
+	10875 9500 9975 9500
+Entry Wire Line
+	7100 9950 7200 10050
+Wire Wire Line
+	7200 10050 8375 10050
+Text Label 8375 10050 2    50   ~ 0
+N64_DATA2
+Entry Wire Line
+	11250 9850 11150 9950
+Wire Wire Line
+	11150 9950 9975 9950
+Text Label 9975 9950 0    50   ~ 0
+N64_DATA4
+Entry Wire Line
+	11250 9950 11150 10050
+Wire Wire Line
+	11150 10050 9975 10050
+Text Label 9975 10050 0    50   ~ 0
+N64_DATA3
+Text Label 9975 9800 0    50   ~ 0
+SPI1SCK
+Text Label 9975 9700 0    50   ~ 0
+SPI1SDI
+Text Label 9975 9600 0    50   ~ 0
+SPI1SDO
+Text Label 9975 9500 0    50   ~ 0
+~CS
+Wire Wire Line
+	1300 10250 1300 9100
+Wire Wire Line
+	1300 9100 2900 9100
+Connection ~ 2900 9100
+Wire Wire Line
+	1400 10550 1400 6975
+Wire Wire Line
+	1400 6975 1550 6975
+Wire Wire Line
+	1550 6975 1550 8600
+Wire Wire Line
+	1550 8600 1775 8600
+Wire Wire Line
+	1775 8600 1775 7200
+Wire Wire Line
+	1775 7200 2800 7200
+Wire Wire Line
+	2800 7200 2800 9000
+Wire Bus Line
+	11250 6500 11250 10350
+Wire Bus Line
+	7100 6500 7100 10350
+Wire Bus Line
+	1100 1750 8925 1750
+Connection ~ 2800 9000
 $EndSCHEMATC
