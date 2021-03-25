@@ -17,11 +17,14 @@ ResVec      code	0x0000
     
 IOCVec	    code	0x0016	; (0x0008 + (2 * 7))
     dw	    (0x0100>>2)
+    
+INT0Vec	    code	0x0018	; (0x0008 + (2 * 8))
+    dw	    (0x0300>>2)
 
 TMR0Vec	    code	0x0046	; (0x0008 + (2 * 31))
-    dw	    (0x0300>>2)
+    dw	    (0x0500>>2)
     
-	    code	0x0400
+	    code	0x0600
 ; === Look at bottom of file for ISR routines ===
     
 ; === DEFINE PINS (text substitutions) ===
@@ -41,6 +44,8 @@ TMR0Vec	    code	0x0046	; (0x0008 + (2 * 31))
 #define     TRIS_N64_DATA       TRISD, 1
 
 #define     PIN_FLASH_CS        LATD,  0
+
+#define	    PIN_STAT_LED	LATE,  2    ; Status LED indicator
 
 
 ; === REGISTERS ===
@@ -66,7 +71,8 @@ TX_DATA2        equ H'0D' ; Data to be transmitted to the console, used as "doub
 UTIL_FLAGS      equ H'0E' ; Utility Flags, initalized with 0x00
 ; <7> If set, determined byte is invalid, decoding should halt
 ; <6> If set, no new NES latches should be accepted
-; <5:0> Unused
+; <5> If set, a TAS replay is in progress
+; <4:0> Unused
 
 ; Pause Clock
 PAUSE_REG_0     equ H'10'
@@ -330,12 +336,13 @@ NESMain:
     
 NESMain_Loop:
     ;; loop until interrupt breaks the loop or device resets
+    bsf	    UTIL_FLAGS, 5
     
     goto    NESMain_Loop
     
 ; INTERRUPT SUBROUTINES ;
 
-IOCISR	    code	0x0116	;; check all IOCxF flag bits
+IOCISR	    code	0x0100	;; check all IOCxF flag bits
     BANKSEL IOCAF
     btfsc   IOCAF, 0
     call    IOCISR_AF0
@@ -437,7 +444,101 @@ IOCISR_ResetCount2:
     return
     
     
-TMR0ISR	    code	0x0300	;; Timer0 has completed	
+INT0ISR	    code	0x0300	;; Start/stop TAS replay
+    movlb   B'000000'
+    ; The device must wait until NES_LATCH has stayed high for at least a couple seconds.
+    ; This wait period is used to indicate that the console reset button is being pressed.
+    
+    ; In the future, this can be replaced with automatic console resetting which will allow this functionality
+    ;   to become usable for other consoles (though each may operate slightly differently).
+    ; This will also hopefully replace remote starting entirely, and will rely on
+    ;   programmed configs for console selection.
+    
+INT0ISR_ButtonWait:
+    btfsc   PORTB, 5	    ; Wait for interrupt button to be released
+    goto    INT0ISR_ButtonWait
+    
+    btfsc   UTIL_FLAGS, 5
+    goto    INT0ISR_Stop
+    ; or continue to _Start
+    
+INT0ISR_Start:	; START PROCEDURE ;
+    BANKSEL TRISA
+    movlw   B'00001011'
+    movwf   TRISA
+    movlb   B'000000'
+    
+    movlw   D'63'
+    movwf   LOOP_COUNT_0
+    bsf	    PIN_STAT_LED
+INT0ISR_FirstCheck:
+    btfss   PIN_NES_LATCH
+    goto    INT0ISR_FirstCheck
+    
+    wait D'70' ; wait just over the expected latch time before checking again
+    
+INT0ISR_SecondCheck:
+    btfss   PIN_NES_LATCH   ; if latch is still set, then continue
+    goto    INT0ISR_Start   ; otherwise, reset counter and restart procedure
+    
+    dcfsnz  LOOP_COUNT_0    ; if we haven't reached zero, then continue
+    goto    INT0ISR_EndOfChecks ; otherwise jump to end of checks
+    
+    wait D'70'
+    goto    INT0ISR_SecondCheck ; wait, then go back to check again
+    
+INT0ISR_EndOfChecks: ; if reached, the console must have been in reset
+    btfsc   PORTB, 5	    ; wait again just to make sure interrupt button is released
+    goto    INT0ISR_EndOfChecks
+    
+    incf    STKPTR, F	    ; we want to return to NESMain, instead of where ever we were previously
+    movlw   low	    NESMain ; so we need to manipulate the STACK with a new return address
+    movwf   TOSL
+    movlw   high    NESMain
+    movwf   TOSH
+    movlw   upper   NESMain
+    movwf   TOSU
+    
+    bcf	    PIN_STAT_LED
+    BANKSEL PIR1
+    bcf	    PIR1, INT0IF
+    
+    retfie
+    
+INT0ISR_Stop:	; STOP PROCEDURE ;  ;!!!!! This should really just get replaced with a software reset !!!!!
+				    ;!!!!!    Don't think this part of the code even works *shrug*    !!!!!
+    bsf	    PIN_STAT_LED
+    bcf	    UTIL_FLAGS, 5
+    
+INT0ISR_StopWait:
+    btfsc   PORTB, 5	    ; wait for button to be released
+    goto    INT0ISR_StopWait
+    
+    setf    PAUSE_REG_0
+    clrf    PAUSE_REG_1
+    call    Pause2D
+    
+    btfsc   PORTB, 5	    ; check again in case of input bounce
+    goto    INT0ISR_StopWait
+    
+    incf    STKPTR, F	    ; we want to return to Start, instead of where ever we were previously
+    movlw   low	    Start   ; so we need to manipulate the STACK with a new return address
+    movwf   TOSL
+    movlw   high    Start
+    movwf   TOSH
+    movlw   upper   Start
+    movwf   TOSU
+    
+    
+    
+    bcf	    PIN_STAT_LED
+    BANKSEL PIR1
+    bcf	    PIR1, INT0IF
+    
+    retfie
+    
+    
+TMR0ISR	    code	0x0500	;; Timer0 has completed	
     BANKSEL IOCAP
     bcf	    IOCAF, 0
     bsf	    IOCAP, 0

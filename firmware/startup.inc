@@ -16,6 +16,8 @@
     movwf   U1RXPPS     ; Set U1RX      to pin RC2
     movlw   B'010101'
     movwf   SPI1SDIPPS  ; Set SPI1SDI   to pin RC5
+    movlw   B'001101'
+    movwf   INT0PPS	; Set INT0	to pin RB5
     
     movlb   B'00000000'
     ; === Register Setup ===
@@ -37,10 +39,10 @@
     clrf    ANSELE
     
     ; 0 is output, 1 is input
-    movlw   B'11111111' ; <3,1-0> are used for NES inputs, but are set later
+    movlw   B'11111111' ; Only <3,1-0> are used for NES inputs, but the others are cleared when a TAS begins
     movwf   TRISA
     
-    movlw   B'00000000'
+    movlw   B'00100000'
     movwf   TRISB
     
     movlw   B'00100100'
@@ -70,6 +72,7 @@
     bsf	    PIN_NES_DATA2
     
     bsf     PIN_FLASH_CS
+    bcf	    PIN_STAT_LED
     
     ; === Enable SPI ===
     movlb   B'111101'   ; Bank 61
@@ -119,10 +122,13 @@
     ; === Enable Interrupts ===
     BANKSEL INTCON0
     bcf	    INTCON0, IPEN_INTCON0   ; Priority is unnecessary, make sure it's left off
+    bsf	    INTCON0, INT0EDG	    ; Set External INT0 to detect rising edge
     
     BANKSEL PIR0
     bcf	    PIR0, IOCIF
     bsf	    PIE0, IOCIE	    ; Interrupt-on-Change enabled
+    bcf	    PIR1, INT0IF
+    bsf	    PIE1, INT0IE    ; External INT0 enabled
     bcf	    PIR3, TMR0IF
     bsf	    PIE3, TMR0IE    ; Timer0 Interrupt enabled
     BANKSEL INTCON0
