@@ -24,6 +24,11 @@ ListenUSBCommands:
     goto    USBRX_Run_NES
     movf    JUNK_REG, 0
     
+    xorlw   USB_CMD_DET_NES
+    btfsc   STATUS, Z
+    goto    USBRX_Det_NES
+    movf    JUNK_REG, 0
+    
     xorlw   USB_CMD_WRITE
     btfsc   STATUS, Z
     goto    USBRX_Write
@@ -85,6 +90,11 @@ USBRX_Run_NES: ; 0x04
     movlw   H'DD'
     movffl  WREG, U1TXB
     goto    NESMain
+    
+USBRX_Det_NES: ; 0x05
+    movlw   H'DD'
+    movffl  WREG, U1TXB
+    goto    NESMain_EverdriveStart
     
     ;;;;==================================================================;;;;
 USBRX_Write: ; 0xAA

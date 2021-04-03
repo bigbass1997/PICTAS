@@ -122,6 +122,7 @@ USB_CMD_PING        equ H'01'
 USB_CMD_DUMP        equ H'02'
 USB_CMD_RUN_N64     equ H'03'
 USB_CMD_RUN_NES     equ H'04'
+USB_CMD_DET_NES	    equ H'05'
 USB_CMD_WRITE       equ H'AA'
 
 N64_CMD_RESET       equ H'FF'
@@ -340,6 +341,54 @@ NESMain_Loop:
     
     goto    NESMain_Loop
     
+    
+; Continuously wait for LATCH to go LOW for significant time, then wait for HIGH edge,
+; then start waiting for significant LOW again. Once significant LOW happens, jump to NESMain.
+NESMain_EverdriveStart:
+    BANKSEL TRISA
+    bsf	    TRISA, 0 ; enable NES_LATCH input
+    movlb   B'000000'
+    bsf	    PIN_STAT_LED
+    
+    movlw   D'127'
+    movwf   LOOP_COUNT_0
+NESEDS_FirstCheck:	    ; wait until LATCH is LOW
+    btfsc   PIN_NES_LATCH
+    goto    NESEDS_FirstCheck
+    
+NESEDS_SecondCheck:
+    btfsc   PIN_NES_LATCH	    ; if latch is still LOW, then continue
+    goto    NESMain_EverdriveStart  ; otherwise, reset counter and restart procedure
+    
+    dcfsnz  LOOP_COUNT_0	    ; if we haven't reached zero, then continue
+    goto    NESEDS_ThirdCheck	    ; otherwise, jump to ThirdCheck
+    
+    wait D'24' ; wait just under 2us
+    goto    NESEDS_SecondCheck	; then go back to check again until counter reaches zero or HIGH which causes reset
+    
+NESEDS_ThirdCheck:	    ; sufficient first LOW has occured, now wait until HIGH
+    btfss   PIN_NES_LATCH
+    goto    NESEDS_ThirdCheck
+    
+NESEDS_FourthCheckReset:
+    movlw   D'127'
+    movwf   LOOP_COUNT_0
+    wait D'70' ; wait for LATCH to go LOW again
+NESEDS_FourthCheck:
+    btfsc   PIN_NES_LATCH
+    goto    NESEDS_FourthCheckReset
+    
+    dcfsnz  LOOP_COUNT_0
+    goto    NESEDS_EndOfChecks
+    
+    wait D'24' ; wait just under 2us
+    goto    NESEDS_FourthCheck
+    
+NESEDS_EndOfChecks:	    ; enough LOW checks have passed a second round, thus we must be starting the game shortly
+    bcf	    PIN_STAT_LED
+    goto    NESMain
+    
+    
 ; INTERRUPT SUBROUTINES ;
 
 IOCISR	    code	0x0100	;; check all IOCxF flag bits
@@ -389,7 +438,7 @@ IOCISR_AF0:
 IOCISR_AF1:
     movlb   0
     
-    wait D'32'
+    wait D'48'
     
     bsf	    STATUS, C
     rlcf    NES_STATE_REG1, 1
@@ -407,7 +456,7 @@ IOCISR_AF1:
 IOCISR_AF3:
     movlb   0
     
-    wait D'32'
+    wait D'48'
     
     bsf	    STATUS, C
     rlcf    NES_STATE_REG2, 1
