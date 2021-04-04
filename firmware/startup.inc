@@ -73,6 +73,7 @@
     
     bsf     PIN_FLASH_CS
     bcf	    PIN_STAT_LED
+    bcf	    PIN_CON_RESET
     
     ; === Enable SPI ===
     movlb   B'111101'   ; Bank 61

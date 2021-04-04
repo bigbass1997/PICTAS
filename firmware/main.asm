@@ -46,6 +46,7 @@ TMR0Vec	    code	0x0046	; (0x0008 + (2 * 31))
 #define     PIN_FLASH_CS        LATD,  0
 
 #define	    PIN_STAT_LED	LATE,  2    ; Status LED indicator
+#define	    PIN_CON_RESET	LATE,  1
 
 
 ; === REGISTERS ===
@@ -402,6 +403,8 @@ IOCISR	    code	0x0100	;; check all IOCxF flag bits
     btfsc   IOCAF, 3
     call    IOCISR_AF3
     
+IOCISR_CheckSucceededCallback:
+    
     retfie
     
 IOCISR_AF0:
@@ -410,6 +413,9 @@ IOCISR_AF0:
     call FlashReadNextNES
     movff   NES_STATE_REG1, NES_STATE_TMP1
     movff   NES_STATE_REG2, NES_STATE_TMP2
+    
+    goto    CheckResetNES
+IOCISR_AF0_CheckFailedCallback:
     
     bsf	    STATUS, C
     rlcf    NES_STATE_REG1, 1
@@ -438,7 +444,7 @@ IOCISR_AF0:
 IOCISR_AF1:
     movlb   0
     
-    wait D'48'
+    wait D'40'
     
     bsf	    STATUS, C
     rlcf    NES_STATE_REG1, 1
@@ -456,7 +462,7 @@ IOCISR_AF1:
 IOCISR_AF3:
     movlb   0
     
-    wait D'48'
+    wait D'40'
     
     bsf	    STATUS, C
     rlcf    NES_STATE_REG2, 1

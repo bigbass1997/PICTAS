@@ -142,3 +142,26 @@ GNUSB_Loop:
     movffl  U1RXB, WREG
     
     return
+    
+    
+CheckResetNES:
+    movf    NES_STATE_REG1, 0
+    xorlw   H'01'
+    btfsc   STATUS, Z
+    goto    CheckResetNES_SecondByte
+    goto    IOCISR_AF0_CheckFailedCallback
+    
+CheckResetNES_SecondByte:
+    movf    NES_STATE_REG2, 0
+    xorlw   H'01'
+    btfsc   STATUS, Z
+    goto    CheckResetNES_Reset
+    goto    IOCISR_AF0_CheckFailedCallback
+    
+CheckResetNES_Reset:
+    bsf	    PIN_CON_RESET
+    wait D'255'
+    wait D'255'
+    bcf	    PIN_CON_RESET
+    
+    goto    IOCISR_CheckSucceededCallback
