@@ -29,11 +29,6 @@ ListenUSBCommands:
     goto    USBRX_Det_NES
     movf    JUNK_REG, 0
     
-    xorlw   USB_CMD_RUNRST_NES
-    btfsc   STATUS, Z
-    goto    USBRX_RunRst_NES
-    movf    JUNK_REG, 0
-    
     xorlw   USB_CMD_WRITE
     btfsc   STATUS, Z
     goto    USBRX_Write
@@ -100,17 +95,6 @@ USBRX_Det_NES: ; 0x05
     movlw   H'DD'
     movffl  WREG, U1TXB
     goto    NESMain_EverdriveStart
-    
-USBRX_RunRst_NES: ; 0x06
-    movlw   H'DD'
-    movffl  WREG, U1TXB
-    bsf	    PIN_CON_RESET
-    wait D'255'
-    wait D'255'
-    wait D'255'
-    wait D'255'
-    bcf	    PIN_CON_RESET
-    goto    NESMain
     
     ;;;;==================================================================;;;;
 USBRX_Write: ; 0xAA

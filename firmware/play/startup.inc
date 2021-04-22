@@ -71,6 +71,7 @@
     bsf	    PIN_NES_DATA1
     bsf	    PIN_NES_DATA2
     
+    bsf	    PIN_UART_HOST
     bsf     PIN_FLASH_CS
     bcf	    PIN_STAT_LED
     bcf	    PIN_CON_RESET
@@ -129,7 +130,7 @@
     bcf	    PIR0, IOCIF
     bsf	    PIE0, IOCIE	    ; Interrupt-on-Change enabled
     bcf	    PIR1, INT0IF
-    bsf	    PIE1, INT0IE    ; External INT0 enabled
+    ;bsf	    PIE1, INT0IE    ; External INT0 enabled
     bcf	    PIR3, TMR0IF
     bsf	    PIE3, TMR0IE    ; Timer0 Interrupt enabled
     BANKSEL INTCON0

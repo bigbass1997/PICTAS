@@ -1,6 +1,6 @@
-    include "p18lf47k42.inc"
+    include "p18f47k42.inc"
     include "macros.inc"
-    processor 18lf47k42
+    processor 18f47k42
     
     CONFIG WDTE = OFF
     CONFIG DEBUG = ON
@@ -39,11 +39,13 @@ TMR0Vec	    code	0x0046	; (0x0008 + (2 * 31))
 
 #define	    PIN_NES_LATCH	PORTA, 0    ; Latch pins for each controller are connected at console-level
 
+#define     PIN_FLASH_CS        LATC,  7
+
+#define	    PIN_UART_HOST	LATC,  1    ; Signal to MCU_Viz whether to write UART to host or not
+
 #define     PIN_N64_DATAIN      PORTD, 1
 #define     PIN_N64_DATAOUT     LATD,  1    ; LAT register is used for writing data out
 #define     TRIS_N64_DATA       TRISD, 1
-
-#define     PIN_FLASH_CS        LATD,  0
 
 #define	    PIN_STAT_LED	LATE,  2    ; Status LED indicator
 #define	    PIN_CON_RESET	LATE,  1
@@ -124,6 +126,7 @@ USB_CMD_DUMP        equ H'02'
 USB_CMD_RUN_N64     equ H'03'
 USB_CMD_RUN_NES     equ H'04'
 USB_CMD_DET_NES	    equ H'05'
+USB_CMD_RUNRST_NES  equ H'06'
 USB_CMD_WRITE       equ H'AA'
 
 N64_CMD_RESET       equ H'FF'
@@ -138,6 +141,10 @@ N64_BIT_ONE     equ B'11110111'
 N64_BIT_CONSSTP equ B'11110111' ; bit <0> is not technically used, but for ease of programming, it is set to 1
 N64_BIT_CONTSTP equ B'11110011'
 
+; SUBROUTINES ;
+    include "sub-utilities.inc"
+    include "sub-flash.inc"
+    
 Setup:
     include "startup.inc"
     
@@ -184,10 +191,7 @@ Start:
     include "usb-handling.inc"
     
     
-; SUBROUTINES ;
-    include "sub-utilities.inc"
-    include "sub-flash.inc"
-    
+    goto    Start
     
 ;;;;;====================== N64 Main Logic ======================;;;;;
 N64Main:
@@ -336,6 +340,8 @@ NESMain:
     movlw   B'00001011'
     movwf   TRISA
     
+    bcf	    PIN_UART_HOST
+    
 NESMain_Loop:
     ;; loop until interrupt breaks the loop or device resets
     bsf	    UTIL_FLAGS, 5
@@ -413,6 +419,8 @@ IOCISR_AF0:
     call FlashReadNextNES
     movff   NES_STATE_REG1, NES_STATE_TMP1
     movff   NES_STATE_REG2, NES_STATE_TMP2
+    movffl   NES_STATE_REG1, U1TXB
+    movffl   NES_STATE_REG2, U1TXB
     
     goto    CheckResetNES
 IOCISR_AF0_CheckFailedCallback:
@@ -485,14 +493,14 @@ IOCISR_End:
     retfie
     
 IOCISR_ResetCount1:
-    movffl  NES_STATE_TMP1, U1TXB
+    ;movffl  NES_STATE_TMP1, U1TXB
     movff   NES_STATE_TMP1, NES_STATE_REG1
     movlw   D'8'
     movwf   NES_COUNT1
     return
     
 IOCISR_ResetCount2:
-    movffl  NES_STATE_TMP2, U1TXB
+    ;movffl  NES_STATE_TMP2, U1TXB
     movff   NES_STATE_TMP2, NES_STATE_REG2
     movlw   D'8'
     movwf   NES_COUNT2
