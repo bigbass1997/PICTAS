@@ -11,11 +11,27 @@ I also have plans to implement an on-board button that will initiate the movie p
 This project is still just a prototype under heavy development. While I will offer help and support as best I can, please understand that significant code and design changes can occur at any time.
 
 ### Usage
-The general process looks like this: Load movie into a [host interface](https://github.com/bigbass1997/PICTAS-Interface). Program the movie's inputs onto the PICTAS device. Turn on and while holding the console's reset button, run the the start command from the host interface.
+The general process looks like this: Load movie into a [host interface](https://github.com/bigbass1997/pictas-interface-rs). Program the movie's inputs and config options onto the PICTAS device. Finally, run one of the available start methods to begin the playback.
 
-Refer to the [PICTAS-Interface project](https://github.com/bigbass1997/PICTAS-Interface) for details on how to use that software. If you would like to make your own interface, you may do so. There will be docs provided here once the communication protocol is better organized and stable. The PICTAS communicates over USB at a 500,000 baud rate. Commands are initiated from the interface software, by sending a single byte value. The PICTAS will respond with one or more bytes depending on the command used.
+Refer to the [PICTAS-Interface project](https://github.com/bigbass1997/pictas-interface-rs) for details on how to use that software. If you would like to make your own interface, you may do so. There will be docs provided here once the communication protocol is better organized and stable. The PICTAS communicates over USB at a 500,000 baud rate. Single byte commands are initiated from the interface. The PICTAS will respond with one or more bytes.
 
-Because the input data is saved onto the device, you will _not_ need to reprogram it again unless you wish to change the TAS inputs. Finally, once the program signals READY, turn on the console and the replay should begin.
+Because the input data is saved onto the device, you will _not_ need to reprogram it again unless you wish to change the TAS inputs.
+
+### Flash Memory Map
+```
+0x000000 - 0xFFEFFF | Sequential controller inputs
+0xFFF000 - 0xFFF0FF | Config options
+0xFFF100 - 0xFFFFFF | Frame-numbered commands
+```
+All except the last sector (4KB) of memory, is dedicated to storing the TAS inputs. Format will depend on the console and how many controllers are used. Within the last sector, the first 256 bytes are for config options, while the rest is for special commands that are performed on specific frame numbers.
+
+Each command is made up of a 3 byte wide number, which specifies the frame number. And then a 1 byte command.
+```
+0x00 | Console Reset
+0x01 | Console Power off and on
+
+0xFF | Null
+```
 
 ### Discord/Support
 If you have questions or suggestions, you can find me on the [N64brew Discord server](https://discord.gg/WqFgNWf) or the [TASBot server](https://discord.tas.bot/).
