@@ -95,15 +95,27 @@ FLASH_ADDR_HIGH equ H'18'
 FLASH_ADDR_MID  equ H'19'
 FLASH_ADDR_LOW  equ H'1A'
 
-; NES Controller Data
-NES_STATE_REG1	equ H'1B'
-NES_STATE_REG2	equ H'1C'
-NES_STATE_TMP1	equ H'1D'
-NES_STATE_TMP2	equ H'1E'
-NES_COUNT1	equ H'1F'
-NES_COUNT2	equ H'20'
+FLASH_EVENT_MID equ H'1B'
+FLASH_EVENT_LOW equ H'1C'
 
-; 0x21 - 0x5E unused
+; NES Controller Data
+NES_STATE_REG1	equ H'1D'
+NES_STATE_REG2	equ H'1E'
+NES_STATE_TMP1	equ H'1F'
+NES_STATE_TMP2	equ H'20'
+NES_COUNT1	equ H'21'
+NES_COUNT2	equ H'22'
+
+; 0x23 - 0x57 unused
+
+CFG_EVENT_HIGH	equ H'58'
+CFG_EVENT_MID	equ H'59'
+CFG_EVENT_LOW	equ H'5A'
+CFG_EVENT_CMD	equ H'5B'
+
+CUR_INPUT_HIGH	equ H'5C'
+CUR_INPUT_MID	equ H'5D'
+CUR_INPUT_LOW	equ H'5E'   ; keeps track of the current input frame
 
 JUNK_REG        equ H'5F'
 
@@ -120,14 +132,27 @@ N64_DATA_TMP3   equ H'64'
 ; BANK 1
 ; This bank is used when writing a 256 byte sector of data to the FLASH memory
 
+; BANK 2
+; Config options are stored here
+
+; 0x00 - 0xFC unused
+
+CFG_LASTF_HIGH	equ H'FD'
+CFG_LASTF_MID	equ H'FE'
+CFG_LASTF_LOW	equ H'FF'
+
+
+
 ; === CONSTANT BYTES ===
 USB_CMD_PING        equ H'01'
 USB_CMD_DUMP        equ H'02'
 USB_CMD_RUN_N64     equ H'03'
 USB_CMD_RUN_NES     equ H'04'
-USB_CMD_DET_NES	    equ H'05'
+USB_CMD_RUNED_NES   equ H'05'
 USB_CMD_RUNRST_NES  equ H'06'
-USB_CMD_WRITE       equ H'AA'
+USB_CMD_RUNMAN_NES  equ H'07'
+USB_CMD_PROGTAS     equ H'AA'
+USB_CMD_PROGCFG     equ H'AB'
 
 N64_CMD_RESET       equ H'FF'
 N64_CMD_INFO        equ H'00'
@@ -196,7 +221,7 @@ Start:
 ;;;;;====================== N64 Main Logic ======================;;;;;
 N64Main:
     ; Prepare first replay frame
-    call    FlashPrepareRead
+    call    FlashPrepareReadZero
     call    RetrieveNextFrame_N64
 N64MainLoop:
     call    ListenForN64
@@ -319,7 +344,7 @@ ContinueLFNL:
     
 ;;;;;====================== NES Main Logic ======================;;;;;
 NESMain:
-    call    FlashPrepareRead
+    call    FlashPrepareReadZero
     
     BANKSEL INTCON0
     bcf	    INTCON0, GIE    ; Temporarily disable global interrupt bit
@@ -415,15 +440,18 @@ IOCISR_CheckSucceededCallback:
     
 IOCISR_AF0:
     movlb   0
+    
+    call    IncrementCurInput
+    goto    CheckResetNES
+    
+IOCISR_AF0_CheckFailedCallback:
+    
     movlw   H'FF'
     call FlashReadNextNES
     movff   NES_STATE_REG1, NES_STATE_TMP1
     movff   NES_STATE_REG2, NES_STATE_TMP2
     movffl   NES_STATE_REG1, U1TXB
     movffl   NES_STATE_REG2, U1TXB
-    
-    goto    CheckResetNES
-IOCISR_AF0_CheckFailedCallback:
     
     bsf	    STATUS, C
     rlcf    NES_STATE_REG1, 1
@@ -525,34 +553,7 @@ INT0ISR_ButtonWait:
     goto    INT0ISR_Stop
     ; or continue to _Start
     
-INT0ISR_Start:	; START PROCEDURE ;
-    BANKSEL TRISA
-    movlw   B'00001011'
-    movwf   TRISA
-    movlb   B'000000'
-    
-    movlw   D'63'
-    movwf   LOOP_COUNT_0
-    bsf	    PIN_STAT_LED
-INT0ISR_FirstCheck:
-    btfss   PIN_NES_LATCH
-    goto    INT0ISR_FirstCheck
-    
-    wait D'70' ; wait just over the expected latch time before checking again
-    
-INT0ISR_SecondCheck:
-    btfss   PIN_NES_LATCH   ; if latch is still set, then continue
-    goto    INT0ISR_Start   ; otherwise, reset counter and restart procedure
-    
-    dcfsnz  LOOP_COUNT_0    ; if we haven't reached zero, then continue
-    goto    INT0ISR_EndOfChecks ; otherwise jump to end of checks
-    
-    wait D'70'
-    goto    INT0ISR_SecondCheck ; wait, then go back to check again
-    
-INT0ISR_EndOfChecks: ; if reached, the console must have been in reset
-    btfsc   PORTB, 5	    ; wait again just to make sure interrupt button is released
-    goto    INT0ISR_EndOfChecks
+    call    WaitResetNES
     
     incf    STKPTR, F	    ; we want to return to NESMain, instead of where ever we were previously
     movlw   low	    NESMain ; so we need to manipulate the STACK with a new return address

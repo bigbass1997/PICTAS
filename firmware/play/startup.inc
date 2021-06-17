@@ -27,6 +27,12 @@
     clrf    FLASH_ADDR_HIGH
     clrf    FLASH_ADDR_MID
     clrf    FLASH_ADDR_LOW
+    movlw   B'11110100'
+    movwf   FLASH_EVENT_MID
+    clrf    FLASH_EVENT_LOW
+    clrf    CUR_INPUT_HIGH
+    clrf    CUR_INPUT_MID
+    clrf    CUR_INPUT_LOW
     
     ; configure I/O ports ; refer to pinout spreadsheet/docs for how these are mapped
     
@@ -138,3 +144,14 @@
     
     ; Specific IOC pins are configured as needed.
     ; This is done to avoid accidental interrupts on irrelevant consoles.
+    
+    
+    ; === Load TAS Config ===
+    call    FlashLoadConfig
+    call    FlashLoadNextEvent
+    
+    
+    
+    
+    
+    ; ====== End ======

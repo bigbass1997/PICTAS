@@ -144,24 +144,93 @@ GNUSB_Loop:
     return
     
     
+; Increments CUR_INPUT_xxxx registers
+IncrementCurInput:
+    movlb   0
+    
+    incfsz  CUR_INPUT_LOW, 1
+    return
+    
+    incfsz  CUR_INPUT_MID, 1
+    return
+    
+    incf    CUR_INPUT_HIGH, 1
+    
+    return
+    
+; Checks if the NES should be reset on the current latch.
+; Used exclusively with IOC ISR for now.
 CheckResetNES:
-    movf    NES_STATE_REG1, 0
-    xorlw   H'01'
-    btfsc   STATUS, Z
-    goto    CheckResetNES_SecondByte
+;    movf    NES_STATE_REG1, 0
+;    xorlw   H'01'
+;    btfsc   STATUS, Z
+;    goto    CheckResetNES_SecondByte
+;    goto    IOCISR_AF0_CheckFailedCallback
+;    
+;CheckResetNES_SecondByte:
+;    movf    NES_STATE_REG2, 0
+;    xorlw   H'01'
+;    btfsc   STATUS, Z
+;    goto    CheckResetNES_Reset
+;    goto    IOCISR_AF0_CheckFailedCallback
+;    
+;CheckResetNES_Reset:
+;    bsf	    PIN_CON_RESET
+;    wait D'255'
+;    wait D'255'
+;    bcf	    PIN_CON_RESET
+    
+    movf    CUR_INPUT_LOW, 1
+    xorwf   CFG_EVENT_LOW, 0
+    btfss   STATUS, Z
     goto    IOCISR_AF0_CheckFailedCallback
     
-CheckResetNES_SecondByte:
-    movf    NES_STATE_REG2, 0
-    xorlw   H'01'
-    btfsc   STATUS, Z
-    goto    CheckResetNES_Reset
+    movf    CUR_INPUT_MID, 1
+    xorwf   CFG_EVENT_MID, 0
+    btfss   STATUS, Z
     goto    IOCISR_AF0_CheckFailedCallback
     
-CheckResetNES_Reset:
+    movf    CUR_INPUT_HIGH, 1
+    xorwf   CFG_EVENT_HIGH, 0
+    btfss   STATUS, Z
+    goto    IOCISR_AF0_CheckFailedCallback
+    
     bsf	    PIN_CON_RESET
     wait D'255'
     wait D'255'
     bcf	    PIN_CON_RESET
     
     goto    IOCISR_CheckSucceededCallback
+    
+    
+; Wait for NES latch to be HIGH significantly longer than normal, indicating a reset.
+WaitResetNES:
+    BANKSEL TRISA
+    movlw   B'00001011'
+    movwf   TRISA
+    movlb   B'000000'
+    
+    movlw   D'63'
+    movwf   LOOP_COUNT_0
+    bsf	    PIN_STAT_LED
+WRNES_FirstCheck:
+    btfss   PIN_NES_LATCH
+    goto    WRNES_FirstCheck
+    
+    wait D'70' ; wait just over the expected latch time before checking again
+    
+WRNES_SecondCheck:
+    btfss   PIN_NES_LATCH   ; if latch is still set, then continue
+    goto    WaitResetNES    ; otherwise, reset counter and restart procedure
+    
+    dcfsnz  LOOP_COUNT_0    ; if we haven't reached zero, then continue
+    goto    WRNES_EndOfChecks ; otherwise jump to end of checks
+    
+    wait D'70'
+    goto    WRNES_SecondCheck ; wait, then go back to check again
+    
+WRNES_EndOfChecks: ; if reached, the console must have been in reset
+    btfsc   PORTB, 5	    ; wait again just to make sure interrupt button is released
+    goto    WRNES_EndOfChecks
+    
+    return

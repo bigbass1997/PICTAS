@@ -107,27 +107,26 @@ FWB_End:
     
     
 ; Prepares FLASH memory for reading sequentially.
-; Because memory is only used for TAS replay, memory read
-; always starts at FLASH address 0x000000.
-FlashPrepareRead:
-    BANKSEL ZEROS_REG
+FlashPrepareReadZero: ; Calling this label will start the read from FLASH address 0x000000
+    movlb   0
+    clrf    FLASH_ADDR_HIGH
+    clrf    FLASH_ADDR_MID
+    clrf    FLASH_ADDR_LOW
+    
+FlashPrepareRead: ; Calling this label will start the read from FLASH_ADDR_HIGH/MID/LOW
+    movlb   0
     bcf	    PIN_FLASH_CS
     
     movlw   H'03'
     movffl  WREG, SPI1TXB
-    movlw   0
-    movffl  WREG, SPI1TXB
+    movffl  FLASH_ADDR_HIGH, SPI1TXB
     wait D'255'
-    nop
-    nop
     movffl  SPI1RXB, JUNK_REG
     movffl  SPI1RXB, JUNK_REG
     
-    movffl  WREG, SPI1TXB
-    movffl  WREG, SPI1TXB
+    movffl  FLASH_ADDR_MID, SPI1TXB
+    movffl  FLASH_ADDR_LOW, SPI1TXB
     wait D'255'
-    nop
-    nop
     movffl  SPI1RXB, JUNK_REG
     movffl  SPI1RXB, JUNK_REG
     
@@ -137,9 +136,7 @@ FlashPrepareRead:
 ;
 FlashReadNext:
     movffl  WREG, SPI1TXB
-    wait D'13'
-    nop
-    nop
+    wait D'15'
     movffl  SPI1RXB, WREG
     
     return
@@ -276,5 +273,64 @@ FlashEraseSector:
     
     
     bsf	    PIN_FLASH_CS
+    
+    return
+    
+    
+; Loads config from FLASH into bank 2
+FlashLoadConfig:
+    movlb   0
+    setf    FLASH_ADDR_HIGH
+    movlw   B'11110000'
+    movwf   FLASH_ADDR_MID
+    clrf    FLASH_ADDR_LOW
+    
+    lfsr    1, H'0200'	; set FSR1 to first address of bank 2
+    
+    call    FlashPrepareRead
+    
+    clrf    WREG
+    BANKSEL FSR1L
+FLC_Loop:
+    movffl  WREG, SPI1TXB
+    wait D'15'
+    movffl  SPI1RXB, POSTINC1
+    
+    tstfsz  FSR1L, 1	; skip next if FSR1L == zero
+    goto    FLC_Loop
+    
+    bsf	    PIN_FLASH_CS
+    
+    return
+    
+    
+; Loads next scheduled event into CFG_EVENT_xxxx registers in bank 2
+FlashLoadNextEvent:
+    movlb   0
+    setf    FLASH_ADDR_HIGH
+    movff   FLASH_EVENT_MID, FLASH_ADDR_MID
+    movff   FLASH_EVENT_LOW, FLASH_ADDR_LOW
+    
+    call    FlashPrepareRead
+    
+    movffl  ZEROS_REG, SPI1TXB
+    movffl  ZEROS_REG, SPI1TXB
+    wait D'25'
+    movffl  SPI1RXB, CFG_EVENT_HIGH
+    movffl  SPI1RXB, CFG_EVENT_MID
+    
+    movffl  ZEROS_REG, SPI1TXB
+    movffl  ZEROS_REG, SPI1TXB
+    wait D'25'
+    movffl  SPI1RXB, CFG_EVENT_LOW
+    movffl  SPI1RXB, CFG_EVENT_CMD
+    
+    bsf	    PIN_FLASH_CS
+    
+    incf    FLASH_EVENT_LOW, 1
+    incf    FLASH_EVENT_LOW, 1
+    incf    FLASH_EVENT_LOW, 1
+    infsnz  FLASH_EVENT_LOW, 1	; increment low address by 4
+    incf    FLASH_EVENT_MID, 1	; if low rolls over, increment mid address by 1
     
     return
