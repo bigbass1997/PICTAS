@@ -19,12 +19,12 @@ IOCVec	    code	0x0016	; (0x0008 + (2 * 7))
     dw	    (0x0100>>2)
     
 INT0Vec	    code	0x0018	; (0x0008 + (2 * 8))
-    dw	    (0x0800>>2)
+    dw	    (0x0300>>2)
 
 TMR0Vec	    code	0x0046	; (0x0008 + (2 * 31))
-    dw	    (0x0A00>>2)
+    dw	    (0x0500>>2)
     
-	    code	0x0B00
+	    code	0x0600
 ; === Look at bottom of file for ISR routines ===
     
 ; === DEFINE PINS (text substitutions) ===
@@ -446,19 +446,6 @@ IOCISR_CheckSucceededCallback:
     
 IOCISR_AF0:
     movlb   0
-    
-    ;bsf	    PIN_UART_HOST
-    ;movffl  CUR_INPUT_HIGH, U1TXB
-    ;wait D'255'
-    ;wait D'67'
-    ;movffl  CUR_INPUT_MID, U1TXB
-    ;wait D'255'
-    ;wait D'67'
-    ;movffl  CUR_INPUT_LOW, U1TXB
-    ;wait D'255'
-    ;wait D'80'
-    ;bcf	    PIN_UART_HOST
-    
     goto    CheckResetNES
     
 IOCISR_AF0_CheckFailedCallback:
@@ -555,7 +542,7 @@ IOCISR_ResetCount2:
     return
     
     
-INT0ISR	    code	0x0800	;; Start/stop TAS replay
+INT0ISR	    code	0x0300	;; Start/stop TAS replay
     movlb   B'000000'
     ; The device must wait until NES_LATCH has stayed high for at least a couple seconds.
     ; This wait period is used to indicate that the console reset button is being pressed.
@@ -622,7 +609,7 @@ INT0ISR_StopWait:
     retfie
     
     
-TMR0ISR	    code	0x0A00	;; Timer0 has completed	
+TMR0ISR	    code	0x0500	;; Timer0 has completed	
     BANKSEL IOCAP
     bcf	    IOCAF, 0
     bsf	    IOCAP, 0

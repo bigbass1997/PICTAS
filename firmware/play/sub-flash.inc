@@ -338,22 +338,6 @@ FlashLoadNextEvent:
     
     bsf	    PIN_FLASH_CS
     
-    
-    bsf	    PIN_UART_HOST
-    movffl  CFG_EVENT_HIGH, U1TXB
-    wait D'255'
-    wait D'67'
-    movffl  CFG_EVENT_MID, U1TXB
-    wait D'255'
-    wait D'67'
-    movffl  CFG_EVENT_LOW, U1TXB
-    wait D'255'
-    wait D'67'
-    movffl  CFG_EVENT_CMD, U1TXB
-    wait D'255'
-    wait D'80'
-    bcf	    PIN_UART_HOST
-    
     incf    FLASH_EVENT_LOW, 1
     incf    FLASH_EVENT_LOW, 1
     incf    FLASH_EVENT_LOW, 1

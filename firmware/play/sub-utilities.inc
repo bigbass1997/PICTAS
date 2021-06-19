@@ -148,56 +148,20 @@ GNUSB_Loop:
 ; Used exclusively with IOC ISR for now.
 CheckResetNES:
     
-    ;bsf	    PIN_UART_HOST
-    ;movffl  CUR_INPUT_LOW, U1TXB
-    ;wait D'255'
-    ;wait D'67'
-    ;movffl  CFG_EVENT_LOW, U1TXB
-    ;wait D'255'
-    ;wait D'80'
-    ;bcf	    PIN_UART_HOST
-    
     movf    CUR_INPUT_LOW, 0
     xorwf   CFG_EVENT_LOW, 0
     btfss   STATUS, Z
     goto    IOCISR_AF0_CheckFailedCallback
-    
-    ;bsf	    PIN_UART_HOST
-    ;movffl  CFG_EVENT_LOW, U1TXB
-    ;wait D'255'
-    ;wait D'67'
-    ;movffl  STATUS, U1TXB
-    ;wait D'255'
-    ;wait D'80'
-    ;bcf	    PIN_UART_HOST
     
     movf    CUR_INPUT_MID, 0
     xorwf   CFG_EVENT_MID, 0
     btfss   STATUS, Z
     goto    IOCISR_AF0_CheckFailedCallback
     
-    ;bsf	    PIN_UART_HOST
-    ;movffl  CFG_EVENT_MID, U1TXB
-    ;wait D'255'
-    ;wait D'67'
-    ;movffl  STATUS, U1TXB
-    ;wait D'255'
-    ;wait D'80'
-    ;bcf	    PIN_UART_HOST
-    
     movf    CUR_INPUT_HIGH, 0
     xorwf   CFG_EVENT_HIGH, 0
     btfss   STATUS, Z
     goto    IOCISR_AF0_CheckFailedCallback
-    
-    ;bsf	    PIN_UART_HOST
-    ;movffl  CFG_EVENT_HIGH, U1TXB
-    ;wait D'255'
-    ;wait D'67'
-    ;movffl  STATUS, U1TXB
-    ;wait D'255'
-    ;wait D'80'
-    ;bcf	    PIN_UART_HOST
     
     movlw   0x01
     xorwf   CFG_EVENT_CMD, 0
@@ -209,9 +173,6 @@ CheckResetNES:
     wait D'255'
     wait D'255'
     bcf	    PIN_CON_RESET
-    
-    ;call    FlashLoadNextEvent
-    ;call    IncrementCurInput
     
     goto    IOCISR_CheckSucceededCallback
     
