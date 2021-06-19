@@ -72,3 +72,18 @@ TXByTmp	    macro lit
     
     endm
     
+    
+; Increments high, mid, and low, registers as a 24-bit number
+; Bank switching to register must be done manually
+; Uses 3 or 5 cycles (low = 3, mid or high = 5)
+; Must be used in a subroutine
+Increment3Registers macro high, mid, low
+    incfsz  low, 1
+    return
+    
+    incfsz  mid, 1
+    return
+    
+    incf    high, 1
+    
+    endm

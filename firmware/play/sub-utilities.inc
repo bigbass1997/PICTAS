@@ -144,60 +144,17 @@ GNUSB_Loop:
     return
     
     
-; Increments CUR_INPUT_xxxx registers
-IncrementCurInput:
-    movlb   0
-    
-    incfsz  CUR_INPUT_LOW, 1
-    return
-    
-    incfsz  CUR_INPUT_MID, 1
-    return
-    
-    incf    CUR_INPUT_HIGH, 1
-    
-    return
-    
 ; Checks if the NES should be reset on the current latch.
 ; Used exclusively with IOC ISR for now.
 CheckResetNES:
-;    movf    NES_STATE_REG1, 0
-;    xorlw   H'01'
-;    btfsc   STATUS, Z
-;    goto    CheckResetNES_SecondByte
-;    goto    IOCISR_AF0_CheckFailedCallback
-;    
-;CheckResetNES_SecondByte:
-;    movf    NES_STATE_REG2, 0
-;    xorlw   H'01'
-;    btfsc   STATUS, Z
-;    goto    CheckResetNES_Reset
-;    goto    IOCISR_AF0_CheckFailedCallback
-;    
-;CheckResetNES_Reset:
-;    bsf	    PIN_CON_RESET
-;    wait D'255'
-;    wait D'255'
-;    bcf	    PIN_CON_RESET
+    
     ;bsf	    PIN_UART_HOST
-    ;movffl  CUR_INPUT_HIGH, U1TXB
-    ;wait D'255'
-    ;wait D'67'
-    ;movffl  CUR_INPUT_MID, U1TXB
-    ;wait D'255'
-    ;wait D'67'
     ;movffl  CUR_INPUT_LOW, U1TXB
-    ;wait D'255'
-    ;wait D'77'
-    ;movffl  CFG_EVENT_HIGH, U1TXB
-    ;wait D'255'
-    ;wait D'67'
-    ;movffl  CFG_EVENT_MID, U1TXB
     ;wait D'255'
     ;wait D'67'
     ;movffl  CFG_EVENT_LOW, U1TXB
     ;wait D'255'
-    ;wait D'90'
+    ;wait D'80'
     ;bcf	    PIN_UART_HOST
     
     movf    CUR_INPUT_LOW, 0
@@ -205,15 +162,42 @@ CheckResetNES:
     btfss   STATUS, Z
     goto    IOCISR_AF0_CheckFailedCallback
     
+    ;bsf	    PIN_UART_HOST
+    ;movffl  CFG_EVENT_LOW, U1TXB
+    ;wait D'255'
+    ;wait D'67'
+    ;movffl  STATUS, U1TXB
+    ;wait D'255'
+    ;wait D'80'
+    ;bcf	    PIN_UART_HOST
+    
     movf    CUR_INPUT_MID, 0
     xorwf   CFG_EVENT_MID, 0
     btfss   STATUS, Z
     goto    IOCISR_AF0_CheckFailedCallback
     
+    ;bsf	    PIN_UART_HOST
+    ;movffl  CFG_EVENT_MID, U1TXB
+    ;wait D'255'
+    ;wait D'67'
+    ;movffl  STATUS, U1TXB
+    ;wait D'255'
+    ;wait D'80'
+    ;bcf	    PIN_UART_HOST
+    
     movf    CUR_INPUT_HIGH, 0
     xorwf   CFG_EVENT_HIGH, 0
     btfss   STATUS, Z
     goto    IOCISR_AF0_CheckFailedCallback
+    
+    ;bsf	    PIN_UART_HOST
+    ;movffl  CFG_EVENT_HIGH, U1TXB
+    ;wait D'255'
+    ;wait D'67'
+    ;movffl  STATUS, U1TXB
+    ;wait D'255'
+    ;wait D'80'
+    ;bcf	    PIN_UART_HOST
     
     movlw   0x01
     xorwf   CFG_EVENT_CMD, 0
@@ -221,11 +205,13 @@ CheckResetNES:
     goto    IOCISR_AF0_CheckFailedCallback
     
     bsf	    PIN_CON_RESET
+    call    FlashLoadNextEvent
     wait D'255'
     wait D'255'
     bcf	    PIN_CON_RESET
     
     ;call    FlashLoadNextEvent
+    ;call    IncrementCurInput
     
     goto    IOCISR_CheckSucceededCallback
     
@@ -259,5 +245,19 @@ WRNES_SecondCheck:
 WRNES_EndOfChecks: ; if reached, the console must have been in reset
     btfsc   PORTB, 5	    ; wait again just to make sure interrupt button is released
     goto    WRNES_EndOfChecks
+    
+    return
+    
+    
+; Inc CUR_INPUT_xxxx registers
+IncrementCurInput:
+    Increment3Registers	CUR_INPUT_HIGH, CUR_INPUT_MID, CUR_INPUT_LOW
+    
+    return
+    
+    
+; Inc FLASH_LAST_xxxx registers
+IncrementFlashLast:
+    Increment3Registers	FLASH_LAST_HIGH, FLASH_LAST_MID, FLASH_LAST_LOW
     
     return

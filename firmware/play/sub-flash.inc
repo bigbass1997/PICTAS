@@ -114,19 +114,21 @@ FlashPrepareReadZero: ; Calling this label will start the read from FLASH addres
     clrf    FLASH_ADDR_LOW
     
 FlashPrepareRead: ; Calling this label will start the read from FLASH_ADDR_HIGH/MID/LOW
+    bsf	    PIN_FLASH_CS
     movlb   0
+    nop
     bcf	    PIN_FLASH_CS
     
     movlw   H'03'
     movffl  WREG, SPI1TXB
     movffl  FLASH_ADDR_HIGH, SPI1TXB
-    wait D'255'
+    wait D'25'
     movffl  SPI1RXB, JUNK_REG
     movffl  SPI1RXB, JUNK_REG
     
     movffl  FLASH_ADDR_MID, SPI1TXB
     movffl  FLASH_ADDR_LOW, SPI1TXB
-    wait D'255'
+    wait D'25'
     movffl  SPI1RXB, JUNK_REG
     movffl  SPI1RXB, JUNK_REG
     
@@ -138,6 +140,8 @@ FlashReadNext:
     movffl  WREG, SPI1TXB
     wait D'15'
     movffl  SPI1RXB, WREG
+    
+    call    IncrementFlashLast
     
     return
 
@@ -154,6 +158,9 @@ FlashReadNextNES:
     nop
     nop
     movffl  SPI1RXB, NES_STATE_REG2
+    
+    call    IncrementFlashLast
+    call    IncrementFlashLast
     
     return
 ;
@@ -311,6 +318,10 @@ FlashLoadNextEvent:
     movff   FLASH_EVENT_MID, FLASH_ADDR_MID
     movff   FLASH_EVENT_LOW, FLASH_ADDR_LOW
     
+    bcf	    UTIL_FLAGS, 4
+    btfsc   PIN_FLASH_CS_RD
+    bsf	    UTIL_FLAGS, 4
+    
     call    FlashPrepareRead
     
     movffl  ZEROS_REG, SPI1TXB
@@ -327,10 +338,35 @@ FlashLoadNextEvent:
     
     bsf	    PIN_FLASH_CS
     
+    
+    bsf	    PIN_UART_HOST
+    movffl  CFG_EVENT_HIGH, U1TXB
+    wait D'255'
+    wait D'67'
+    movffl  CFG_EVENT_MID, U1TXB
+    wait D'255'
+    wait D'67'
+    movffl  CFG_EVENT_LOW, U1TXB
+    wait D'255'
+    wait D'67'
+    movffl  CFG_EVENT_CMD, U1TXB
+    wait D'255'
+    wait D'80'
+    bcf	    PIN_UART_HOST
+    
     incf    FLASH_EVENT_LOW, 1
     incf    FLASH_EVENT_LOW, 1
     incf    FLASH_EVENT_LOW, 1
     infsnz  FLASH_EVENT_LOW, 1	; increment low address by 4
     incf    FLASH_EVENT_MID, 1	; if low rolls over, increment mid address by 1
+    
+    btfsc   UTIL_FLAGS, 4
+    return
+    
+    ; restore previously ongoing input read
+    movff   FLASH_LAST_HIGH, FLASH_ADDR_HIGH
+    movff   FLASH_LAST_MID, FLASH_ADDR_MID
+    movff   FLASH_LAST_LOW, FLASH_ADDR_LOW
+    call    FlashPrepareRead
     
     return

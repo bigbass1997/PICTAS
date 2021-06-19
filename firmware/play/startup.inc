@@ -33,6 +33,9 @@
     clrf    CUR_INPUT_HIGH
     clrf    CUR_INPUT_MID
     clrf    CUR_INPUT_LOW
+    clrf    FLASH_LAST_HIGH
+    clrf    FLASH_LAST_MID
+    clrf    FLASH_LAST_LOW
     
     ; configure I/O ports ; refer to pinout spreadsheet/docs for how these are mapped
     
@@ -150,6 +153,7 @@
     call    FlashLoadConfig
     call    FlashLoadNextEvent
     
+    bsf	    PIN_UART_HOST
     
     
     

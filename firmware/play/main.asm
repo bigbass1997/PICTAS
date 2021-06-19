@@ -19,12 +19,12 @@ IOCVec	    code	0x0016	; (0x0008 + (2 * 7))
     dw	    (0x0100>>2)
     
 INT0Vec	    code	0x0018	; (0x0008 + (2 * 8))
-    dw	    (0x0300>>2)
+    dw	    (0x0800>>2)
 
 TMR0Vec	    code	0x0046	; (0x0008 + (2 * 31))
-    dw	    (0x0500>>2)
+    dw	    (0x0A00>>2)
     
-	    code	0x0600
+	    code	0x0B00
 ; === Look at bottom of file for ISR routines ===
     
 ; === DEFINE PINS (text substitutions) ===
@@ -40,6 +40,7 @@ TMR0Vec	    code	0x0046	; (0x0008 + (2 * 31))
 #define	    PIN_NES_LATCH	PORTA, 0    ; Latch pins for each controller are connected at console-level
 
 #define     PIN_FLASH_CS        LATC,  7
+#define	    PIN_FLASH_CS_RD	PORTC, 7    ; Used to check what the last set state was
 
 #define	    PIN_UART_HOST	LATC,  1    ; Signal to MCU_Viz whether to write UART to host or not
 
@@ -75,7 +76,8 @@ UTIL_FLAGS      equ H'0E' ; Utility Flags, initalized with 0x00
 ; <7> If set, determined byte is invalid, decoding should halt
 ; <6> If set, no new NES latches should be accepted
 ; <5> If set, a TAS replay is in progress
-; <4:0> Unused
+; <4> Used by FlashLoadNextEvent to store previous PIN_FLASH_CS state
+; <3:0> Unused
 
 ; Pause Clock
 PAUSE_REG_0     equ H'10'
@@ -95,16 +97,20 @@ FLASH_ADDR_HIGH equ H'18'
 FLASH_ADDR_MID  equ H'19'
 FLASH_ADDR_LOW  equ H'1A'
 
-FLASH_EVENT_MID equ H'1B'
-FLASH_EVENT_LOW equ H'1C'
+FLASH_LAST_HIGH	equ H'1B'
+FLASH_LAST_MID	equ H'1C'
+FLASH_LAST_LOW	equ H'1D'
+
+FLASH_EVENT_MID equ H'1E'
+FLASH_EVENT_LOW equ H'1F'
 
 ; NES Controller Data
-NES_STATE_REG1	equ H'1D'
-NES_STATE_REG2	equ H'1E'
-NES_STATE_TMP1	equ H'1F'
-NES_STATE_TMP2	equ H'20'
-NES_COUNT1	equ H'21'
-NES_COUNT2	equ H'22'
+NES_STATE_REG1	equ H'20'
+NES_STATE_REG2	equ H'21'
+NES_STATE_TMP1	equ H'22'
+NES_STATE_TMP2	equ H'23'
+NES_COUNT1	equ H'24'
+NES_COUNT2	equ H'25'
 
 ; 0x23 - 0x57 unused
 
@@ -441,7 +447,18 @@ IOCISR_CheckSucceededCallback:
 IOCISR_AF0:
     movlb   0
     
-    call    IncrementCurInput
+    ;bsf	    PIN_UART_HOST
+    ;movffl  CUR_INPUT_HIGH, U1TXB
+    ;wait D'255'
+    ;wait D'67'
+    ;movffl  CUR_INPUT_MID, U1TXB
+    ;wait D'255'
+    ;wait D'67'
+    ;movffl  CUR_INPUT_LOW, U1TXB
+    ;wait D'255'
+    ;wait D'80'
+    ;bcf	    PIN_UART_HOST
+    
     goto    CheckResetNES
     
 IOCISR_AF0_CheckFailedCallback:
@@ -468,6 +485,9 @@ IOCISR_AF0_CheckFailedCallback:
     movlw   D'7'
     movwf   NES_COUNT1
     movwf   NES_COUNT2
+    
+    movlb   0
+    call    IncrementCurInput
     
     BANKSEL T0CON0
     bsf	    T0CON0, 7
@@ -535,7 +555,7 @@ IOCISR_ResetCount2:
     return
     
     
-INT0ISR	    code	0x0300	;; Start/stop TAS replay
+INT0ISR	    code	0x0800	;; Start/stop TAS replay
     movlb   B'000000'
     ; The device must wait until NES_LATCH has stayed high for at least a couple seconds.
     ; This wait period is used to indicate that the console reset button is being pressed.
@@ -602,7 +622,7 @@ INT0ISR_StopWait:
     retfie
     
     
-TMR0ISR	    code	0x0500	;; Timer0 has completed	
+TMR0ISR	    code	0x0A00	;; Timer0 has completed	
     BANKSEL IOCAP
     bcf	    IOCAF, 0
     bsf	    IOCAP, 0
