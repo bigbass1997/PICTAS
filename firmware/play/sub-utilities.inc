@@ -179,19 +179,44 @@ CheckResetNES:
 ;    wait D'255'
 ;    wait D'255'
 ;    bcf	    PIN_CON_RESET
+    ;bsf	    PIN_UART_HOST
+    ;movffl  CUR_INPUT_HIGH, U1TXB
+    ;wait D'255'
+    ;wait D'67'
+    ;movffl  CUR_INPUT_MID, U1TXB
+    ;wait D'255'
+    ;wait D'67'
+    ;movffl  CUR_INPUT_LOW, U1TXB
+    ;wait D'255'
+    ;wait D'77'
+    ;movffl  CFG_EVENT_HIGH, U1TXB
+    ;wait D'255'
+    ;wait D'67'
+    ;movffl  CFG_EVENT_MID, U1TXB
+    ;wait D'255'
+    ;wait D'67'
+    ;movffl  CFG_EVENT_LOW, U1TXB
+    ;wait D'255'
+    ;wait D'90'
+    ;bcf	    PIN_UART_HOST
     
-    movf    CUR_INPUT_LOW, 1
+    movf    CUR_INPUT_LOW, 0
     xorwf   CFG_EVENT_LOW, 0
     btfss   STATUS, Z
     goto    IOCISR_AF0_CheckFailedCallback
     
-    movf    CUR_INPUT_MID, 1
+    movf    CUR_INPUT_MID, 0
     xorwf   CFG_EVENT_MID, 0
     btfss   STATUS, Z
     goto    IOCISR_AF0_CheckFailedCallback
     
-    movf    CUR_INPUT_HIGH, 1
+    movf    CUR_INPUT_HIGH, 0
     xorwf   CFG_EVENT_HIGH, 0
+    btfss   STATUS, Z
+    goto    IOCISR_AF0_CheckFailedCallback
+    
+    movlw   0x01
+    xorwf   CFG_EVENT_CMD, 0
     btfss   STATUS, Z
     goto    IOCISR_AF0_CheckFailedCallback
     
@@ -199,6 +224,8 @@ CheckResetNES:
     wait D'255'
     wait D'255'
     bcf	    PIN_CON_RESET
+    
+    ;call    FlashLoadNextEvent
     
     goto    IOCISR_CheckSucceededCallback
     

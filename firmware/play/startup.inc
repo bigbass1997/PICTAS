@@ -27,7 +27,7 @@
     clrf    FLASH_ADDR_HIGH
     clrf    FLASH_ADDR_MID
     clrf    FLASH_ADDR_LOW
-    movlw   B'11110100'
+    movlw   B'11110001'
     movwf   FLASH_EVENT_MID
     clrf    FLASH_EVENT_LOW
     clrf    CUR_INPUT_HIGH

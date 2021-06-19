@@ -186,8 +186,8 @@ USBRX_ProgCfg: ; 0xAB
     ;   This allows for a maximum of 960 custom events, with a maximum frame number of 16,777,215.
     
     ; Event command list
-    ;   0x00 = Console Reset
-    ;	0x01 = Console Power (Off then On) ; unsupported!
+    ;   0x01 = Console Reset
+    ;	0x02 = Console Power (Off then On) ; unsupported!
     ;   
     ;   0xFF = Null (no command)
     
@@ -225,6 +225,9 @@ USBRX_ProgCfg_ByteLoop:
     decfsz  LOOP_COUNT_1
     goto    USBRX_ProgCfg_PageLoop
     ; if 16 pages have been written, then config sector programming is complete
+    
+    movlw   H'DD'
+    movffl  WREG, U1TXB ; Send OK
     
     goto    ListenUSBCommands
     
