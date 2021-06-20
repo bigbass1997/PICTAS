@@ -473,15 +473,15 @@ IOCISR_AF0_CheckFailedCallback:
     movwf   NES_COUNT1
     movwf   NES_COUNT2
     
-    movlb   0
-    call    IncrementCurInput
-    
     BANKSEL T0CON0
     bsf	    T0CON0, 7
     
     BANKSEL IOCAF
     bcf	    IOCAF, 0
     bcf	    IOCAP, 0
+    
+    Increment3Registers	CUR_INPUT_HIGH, CUR_INPUT_MID, CUR_INPUT_LOW
+    
     return
     
 IOCISR_AF1:

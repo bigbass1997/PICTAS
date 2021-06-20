@@ -149,12 +149,8 @@ FlashReadNext:
 FlashReadNextNES:
     movffl  WREG, SPI1TXB
     movffl  WREG, SPI1TXB
-    wait D'22'
-    nop
-    nop
+    wait D'24'
     movffl  SPI1RXB, NES_STATE_REG1
-    nop
-    nop
     nop
     nop
     movffl  SPI1RXB, NES_STATE_REG2
