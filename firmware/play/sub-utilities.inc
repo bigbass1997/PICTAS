@@ -166,7 +166,7 @@ CheckResetNES:
     movlw   0x01
     xorwf   CFG_EVENT_CMD, 0
     btfss   STATUS, Z
-    goto    IOCISR_AF0_CheckFailedCallback
+    goto    IOCISR_AF0_CheckFailedCallback ; 27 after goto
     
     bsf	    PIN_CON_RESET
     call    FlashLoadNextEvent

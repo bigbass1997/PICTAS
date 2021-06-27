@@ -88,7 +88,7 @@
     ; === Enable SPI ===
     movlb   B'111101'   ; Bank 61
     clrf    SPI1TWIDTH
-    movlw   D'2'
+    movlw   D'1'
     movwf   SPI1BAUD        ; Set baud rate = ( 64000000 / (2 * (x + 1)) )
     bsf     SPI1CON0, MST
     bsf     SPI1CON0, BMODE
