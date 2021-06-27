@@ -149,25 +149,12 @@ FlashReadNext:
 FlashReadNextNES:
     movffl  WREG, SPI1TXB
     movffl  WREG, SPI1TXB
-    wait D'16'
+    wait D'25'
     movffl  SPI1RXB, NES_STATE_REG1
     movffl  SPI1RXB, NES_STATE_REG2
     
-    incfsz  FLASH_LAST_LOW, 1
-    goto    CoolOneIsDone
-    
-    incfsz  FLASH_LAST_MID, 1
-    goto    CoolOneIsDone
-    
-    incf    FLASH_LAST_HIGH, 1
-CoolOneIsDone:
-    incfsz  FLASH_LAST_LOW, 1
-    return
-    
-    incfsz  FLASH_LAST_MID, 1
-    return
-    
-    incf    FLASH_LAST_HIGH, 1
+    call    IncrementFlashLast
+    call    IncrementFlashLast
     
     return
 ;

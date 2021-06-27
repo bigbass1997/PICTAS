@@ -24,7 +24,7 @@ INT0Vec	    code	0x0018	; (0x0008 + (2 * 8))
 TMR0Vec	    code	0x0046	; (0x0008 + (2 * 31))
     dw	    (0x0500>>2)
     
-	    code	0x0600
+	    code	0x0A00
 ; === Look at bottom of file for ISR routines ===
     
 ; === DEFINE PINS (text substitutions) ===
@@ -77,7 +77,8 @@ UTIL_FLAGS      equ H'0E' ; Utility Flags, initalized with 0x00
 ; <6> If set, no new NES latches should be accepted
 ; <5> If set, a TAS replay is in progress
 ; <4> Used by FlashLoadNextEvent to store previous PIN_FLASH_CS state
-; <3:0> Unused
+; <3> If set, reset NES on next latch
+; <2:0> Unused
 
 ; Pause Clock
 PAUSE_REG_0     equ H'10'
@@ -373,6 +374,26 @@ NESMain:
     
     bcf	    PIN_UART_HOST
     
+    movlb   0
+    call    CheckResetNES
+    
+    movlw   H'FF'
+    call    FlashReadNextNES
+    movffl  NES_STATE_REG1, U1TXB
+    movffl  NES_STATE_REG2, U1TXB
+    
+    call    CheckResetNES
+    
+    incfsz  CUR_INPUT_LOW, 1
+    goto    NESMain_IncEnd
+    
+    incfsz  CUR_INPUT_MID, 1
+    goto    NESMain_IncEnd
+    
+    incf    CUR_INPUT_HIGH, 1
+NESMain_IncEnd:
+    
+    
 NESMain_Loop:
     ;; loop until interrupt breaks the loop or device resets
     bsf	    UTIL_FLAGS, 5
@@ -440,63 +461,88 @@ IOCISR	    code	0x0100	;; check all IOCxF flag bits
     btfsc   IOCAF, 3
     call    IOCISR_AF3
     
-IOCISR_CheckSucceededCallback:
+;IOCISR_CheckSucceededCallback:
     
     retfie
     
 IOCISR_AF0:
     movlb   0
-    goto    CheckResetNES
     
-IOCISR_AF0_CheckFailedCallback:
+    btfss   UTIL_FLAGS, 3
+    goto    IOCISR_AF0_ResetNotNeeded
+    
+    bcf	    UTIL_FLAGS, 3
+    call    ResetNES
     
     movlw   H'FF'
-    call FlashReadNextNES
+    call    FlashReadNextNES
+    
+    call    CheckResetNES
+    
+    incfsz  CUR_INPUT_LOW, 1
+    goto    IOCISR_AF0_IncEnd
+    
+    incfsz  CUR_INPUT_MID, 1
+    goto    IOCISR_AF0_IncEnd
+    
+    incf    CUR_INPUT_HIGH, 1
+IOCISR_AF0_IncEnd:
+    
+    BANKSEL IOCAF
+    bcf	    IOCAF, 0
+    bcf	    IOCAF, 1
+    bcf	    IOCAF, 3
+    retfie
+    
+IOCISR_AF0_ResetNotNeeded:
+;IOCISR_AF0_CheckFailedCallback:
+    movffl  NES_STATE_REG1, U1TXB
+    movffl  NES_STATE_REG2, U1TXB
+    
     movff   NES_STATE_REG1, NES_STATE_TMP1
     movff   NES_STATE_REG2, NES_STATE_TMP2
-    movffl   NES_STATE_REG1, U1TXB
-    movffl   NES_STATE_REG2, U1TXB
     
     bsf	    STATUS, C
-    rlcf    NES_STATE_REG1, 1
+    rlcf    NES_STATE_TMP1, 1
     bsf	    PIN_NES_DATA1
     btfss   STATUS, C
     bcf	    PIN_NES_DATA1
     
     bsf	    STATUS, C
-    rlcf    NES_STATE_REG2, 1
+    rlcf    NES_STATE_TMP2, 1
     bsf	    PIN_NES_DATA2
     btfss   STATUS, C
     bcf	    PIN_NES_DATA2
     
-    movlw   D'7'
-    movwf   NES_COUNT1
-    movwf   NES_COUNT2
+    ;movlw   D'7'
+    ;movwf   NES_COUNT1
+    ;movwf   NES_COUNT2
     
     BANKSEL T0CON0
+    btfss   T0CON0, 7
     bsf	    T0CON0, 7
     
     BANKSEL IOCAF
     bcf	    IOCAF, 0
-    bcf	    IOCAP, 0
+    ;bcf	    IOCAP, 0
     
-    Increment3Registers	CUR_INPUT_HIGH, CUR_INPUT_MID, CUR_INPUT_LOW
+    ;Increment3Registers	CUR_INPUT_HIGH, CUR_INPUT_MID, CUR_INPUT_LOW
     
     return
     
 IOCISR_AF1:
     movlb   0
     
-    wait D'40'
+    wait D'40'	; clock filter
     
-    bsf	    STATUS, C
-    rlcf    NES_STATE_REG1, 1
+    bsf	    STATUS, C	; overread
+    rlcf    NES_STATE_TMP1, 1
     bsf	    PIN_NES_DATA1
     btfss   STATUS, C
     bcf	    PIN_NES_DATA1
     
-    dcfsnz  NES_COUNT1
-    call    IOCISR_ResetCount1
+    ;dcfsnz  NES_COUNT1
+    ;call    IOCISR_ResetCount1
     
     BANKSEL IOCAF
     bcf	    IOCAF, 1
@@ -505,16 +551,16 @@ IOCISR_AF1:
 IOCISR_AF3:
     movlb   0
     
-    wait D'40'
+    wait D'40'	; clock filter
     
-    bsf	    STATUS, C
-    rlcf    NES_STATE_REG2, 1
+    bsf	    STATUS, C	; overread
+    rlcf    NES_STATE_TMP2, 1
     bsf	    PIN_NES_DATA2
     btfss   STATUS, C
     bcf	    PIN_NES_DATA2
     
-    dcfsnz  NES_COUNT2
-    call    IOCISR_ResetCount2
+    ;dcfsnz  NES_COUNT2
+    ;call    IOCISR_ResetCount2
     
     BANKSEL IOCAF
     bcf	    IOCAF, 3
@@ -529,14 +575,14 @@ IOCISR_End:
     
 IOCISR_ResetCount1:
     ;movffl  NES_STATE_TMP1, U1TXB
-    movff   NES_STATE_TMP1, NES_STATE_REG1
+    movff   NES_STATE_REG1, NES_STATE_TMP1
     movlw   D'8'
     movwf   NES_COUNT1
     return
     
 IOCISR_ResetCount2:
     ;movffl  NES_STATE_TMP2, U1TXB
-    movff   NES_STATE_TMP2, NES_STATE_REG2
+    movff   NES_STATE_REG2, NES_STATE_TMP2
     movlw   D'8'
     movwf   NES_COUNT2
     return
@@ -610,12 +656,37 @@ INT0ISR_StopWait:
     
     
 TMR0ISR	    code	0x0500	;; Timer0 has completed	
-    BANKSEL IOCAP
-    bcf	    IOCAF, 0
-    bsf	    IOCAP, 0
+    ;BANKSEL IOCAP
+    ;bcf	    IOCAF, 0
+    ;bsf	    IOCAP, 0
     
     BANKSEL T0CON0
-    bcf	    T0CON0, 7
+    bcf	    T0CON0, 7	; disable timer0
+    
+    movlb   0
+    movlw   H'FF'
+    call    FlashReadNextNES
+    
+    call    CheckResetNES
+    
+    ;movffl  CUR_INPUT_HIGH, U1TXB
+    ;wait D'255'
+    ;wait D'67'
+    ;movffl  CUR_INPUT_MID, U1TXB
+    ;wait D'255'
+    ;wait D'67'
+    ;movffl  CUR_INPUT_LOW, U1TXB
+    
+    
+    incfsz  CUR_INPUT_LOW, 1
+    goto    TMR0ISR_IncEnd
+    
+    incfsz  CUR_INPUT_MID, 1
+    goto    TMR0ISR_IncEnd
+    
+    incf    CUR_INPUT_HIGH, 1
+TMR0ISR_IncEnd:
+    
     
     BANKSEL PIR3
     bcf	    PIR3, TMR0IF

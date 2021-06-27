@@ -147,34 +147,42 @@ GNUSB_Loop:
 ; Checks if the NES should be reset on the current latch.
 ; Used exclusively with IOC ISR for now.
 CheckResetNES:
+    movlb   0
     
     movf    CUR_INPUT_LOW, 0
     xorwf   CFG_EVENT_LOW, 0
     btfss   STATUS, Z
-    goto    IOCISR_AF0_CheckFailedCallback
+    return
     
     movf    CUR_INPUT_MID, 0
     xorwf   CFG_EVENT_MID, 0
     btfss   STATUS, Z
-    goto    IOCISR_AF0_CheckFailedCallback
+    return
     
     movf    CUR_INPUT_HIGH, 0
     xorwf   CFG_EVENT_HIGH, 0
     btfss   STATUS, Z
-    goto    IOCISR_AF0_CheckFailedCallback
+    return
     
     movlw   0x01
     xorwf   CFG_EVENT_CMD, 0
     btfss   STATUS, Z
-    goto    IOCISR_AF0_CheckFailedCallback ; 27 after goto
+    return
     
-    bsf	    PIN_CON_RESET
+    bsf	    UTIL_FLAGS, 3
     call    FlashLoadNextEvent
+    
+    
+    return
+    
+    
+; Resets the NES
+ResetNES:
+    bsf	    PIN_CON_RESET ; reset NES
     wait D'255'
     wait D'255'
     bcf	    PIN_CON_RESET
-    
-    goto    IOCISR_CheckSucceededCallback
+    return
     
     
 ; Wait for NES latch to be HIGH significantly longer than normal, indicating a reset.
