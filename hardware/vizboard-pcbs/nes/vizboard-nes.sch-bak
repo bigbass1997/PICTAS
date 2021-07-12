@@ -1,0 +1,390 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Wire Wire Line
+	2450 3675 3450 3675
+Wire Wire Line
+	2450 3775 3450 3775
+Wire Wire Line
+	2450 3875 3450 3875
+Text Label 2450 3675 0    50   ~ 0
+SER
+Text Label 2450 3775 0    50   ~ 0
+CLK
+Text Label 2450 3875 0    50   ~ 0
+STROBE
+Text Label 2450 3575 0    50   ~ 0
+GND
+Text Label 2450 3975 0    50   ~ 0
+5V
+Wire Wire Line
+	2450 3575 3350 3575
+Wire Wire Line
+	3350 3575 3350 3475
+Wire Wire Line
+	3350 3475 3450 3475
+Wire Wire Line
+	2450 3975 3350 3975
+Wire Wire Line
+	3350 4275 3450 4275
+Wire Wire Line
+	3350 3975 3350 4075
+$Comp
+L 74xx:74HC595 U1
+U 1 1 6076C312
+P 3900 3775
+F 0 "U1" H 3900 4400 50  0000 C CNN
+F 1 "74HC595" H 3900 4325 50  0000 C CNN
+F 2 "Package_DIP:DIP-16_W7.62mm" H 3900 3775 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/sn74hc595.pdf" H 3900 3775 50  0001 C CNN
+	1    3900 3775
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3350 4075 3450 4075
+Connection ~ 3350 4075
+Wire Wire Line
+	3350 4075 3350 4275
+Wire Wire Line
+	3350 3475 3350 3375
+Wire Wire Line
+	3350 3375 3450 3375
+Connection ~ 3350 3475
+Wire Wire Line
+	4350 3375 4550 3375
+Wire Wire Line
+	4350 3475 4550 3475
+Wire Wire Line
+	4350 3575 4550 3575
+Wire Wire Line
+	4350 3675 4550 3675
+Wire Wire Line
+	4350 3775 4550 3775
+Wire Wire Line
+	4350 3875 4550 3875
+Wire Wire Line
+	4350 3975 4550 3975
+Wire Wire Line
+	4350 4075 4550 4075
+$Comp
+L TLC59211IN:TLC59211IN U2
+U 1 1 60782CB6
+P 5000 3725
+F 0 "U2" H 5000 4400 50  0000 C CNN
+F 1 "TLC59211IN" H 5000 4325 50  0000 C CNN
+F 2 "Package_DIP:DIP-20_W7.62mm" H 5000 3725 50  0001 C CNN
+F 3 "" H 3900 4175 60  0000 C CNN
+	1    5000 3725
+	1    0    0    -1  
+$EndComp
+NoConn ~ 4550 4175
+NoConn ~ 4550 3275
+NoConn ~ 4350 4275
+Wire Wire Line
+	3350 4475 3350 4275
+Connection ~ 3350 4275
+Wire Wire Line
+	3350 2975 3350 3375
+Connection ~ 3350 3375
+Wire Wire Line
+	5450 4175 5550 4175
+Wire Wire Line
+	5550 4175 5550 4475
+Wire Wire Line
+	5550 4475 3350 4475
+$Comp
+L Device:R_Small R1
+U 1 1 607AA313
+P 6250 3375
+F 0 "R1" V 6225 3450 25  0000 L CNN
+F 1 "2K" V 6250 3375 25  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" H 6250 3375 50  0001 C CNN
+F 3 "~" H 6250 3375 50  0001 C CNN
+	1    6250 3375
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:LED_Small D1
+U 1 1 607ABC6C
+P 5850 3375
+F 0 "D1" H 5900 3400 25  0000 L CNN
+F 1 "LED_Blue" H 5900 3350 25  0000 L CNN
+F 2 "LED_THT:LED_D5.0mm" V 5850 3375 50  0001 C CNN
+F 3 "~" V 5850 3375 50  0001 C CNN
+	1    5850 3375
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5450 3375 5750 3375
+Text Label 5450 4075 0    50   ~ 0
+A
+Text Label 5450 3975 0    50   ~ 0
+B
+Text Label 5450 3875 0    50   ~ 0
+SEL
+Text Label 5450 3775 0    50   ~ 0
+STA
+Text Label 5450 3675 0    50   ~ 0
+UP
+Text Label 5450 3575 0    50   ~ 0
+DOWN
+Text Label 5450 3475 0    50   ~ 0
+LEFT
+Text Label 5450 3375 0    50   ~ 0
+RIGHT
+Wire Wire Line
+	5950 3375 6150 3375
+Wire Wire Line
+	6350 3375 6450 3375
+$Comp
+L Device:R_Small R2
+U 1 1 607B757F
+P 6250 3475
+F 0 "R2" V 6225 3550 25  0000 L CNN
+F 1 "2K" V 6250 3475 25  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" H 6250 3475 50  0001 C CNN
+F 3 "~" H 6250 3475 50  0001 C CNN
+	1    6250 3475
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:LED_Small D2
+U 1 1 607B7585
+P 5850 3475
+F 0 "D2" H 5900 3500 25  0000 L CNN
+F 1 "LED_Blue" H 5900 3450 25  0000 L CNN
+F 2 "LED_THT:LED_D5.0mm" V 5850 3475 50  0001 C CNN
+F 3 "~" V 5850 3475 50  0001 C CNN
+	1    5850 3475
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5450 3475 5750 3475
+Wire Wire Line
+	5950 3475 6150 3475
+Wire Wire Line
+	6350 3475 6450 3475
+$Comp
+L Device:R_Small R3
+U 1 1 607B8185
+P 6250 3575
+F 0 "R3" V 6225 3650 25  0000 L CNN
+F 1 "2K" V 6250 3575 25  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" H 6250 3575 50  0001 C CNN
+F 3 "~" H 6250 3575 50  0001 C CNN
+	1    6250 3575
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:LED_Small D3
+U 1 1 607B818B
+P 5850 3575
+F 0 "D3" H 5900 3600 25  0000 L CNN
+F 1 "LED_Blue" H 5900 3550 25  0000 L CNN
+F 2 "LED_THT:LED_D5.0mm" V 5850 3575 50  0001 C CNN
+F 3 "~" V 5850 3575 50  0001 C CNN
+	1    5850 3575
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5450 3575 5750 3575
+Wire Wire Line
+	5950 3575 6150 3575
+Wire Wire Line
+	6350 3575 6450 3575
+$Comp
+L Device:R_Small R4
+U 1 1 607B8D06
+P 6250 3675
+F 0 "R4" V 6225 3750 25  0000 L CNN
+F 1 "2K" V 6250 3675 25  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" H 6250 3675 50  0001 C CNN
+F 3 "~" H 6250 3675 50  0001 C CNN
+	1    6250 3675
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:LED_Small D4
+U 1 1 607B8D0C
+P 5850 3675
+F 0 "D4" H 5900 3700 25  0000 L CNN
+F 1 "LED_Blue" H 5900 3650 25  0000 L CNN
+F 2 "LED_THT:LED_D5.0mm" V 5850 3675 50  0001 C CNN
+F 3 "~" V 5850 3675 50  0001 C CNN
+	1    5850 3675
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5450 3675 5750 3675
+Wire Wire Line
+	5950 3675 6150 3675
+Wire Wire Line
+	6350 3675 6450 3675
+$Comp
+L Device:R_Small R5
+U 1 1 607B9889
+P 6250 3775
+F 0 "R5" V 6225 3850 25  0000 L CNN
+F 1 "1K" V 6250 3775 25  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" H 6250 3775 50  0001 C CNN
+F 3 "~" H 6250 3775 50  0001 C CNN
+	1    6250 3775
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:LED_Small D5
+U 1 1 607B988F
+P 5850 3775
+F 0 "D5" H 5900 3800 25  0000 L CNN
+F 1 "LED_Yellow" H 5900 3750 25  0000 L CNN
+F 2 "LED_THT:LED_D5.0mm" V 5850 3775 50  0001 C CNN
+F 3 "~" V 5850 3775 50  0001 C CNN
+	1    5850 3775
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5450 3775 5750 3775
+Wire Wire Line
+	5950 3775 6150 3775
+Wire Wire Line
+	6350 3775 6450 3775
+$Comp
+L Device:R_Small R6
+U 1 1 607BBFB3
+P 6250 3875
+F 0 "R6" V 6225 3950 25  0000 L CNN
+F 1 "1K" V 6250 3875 25  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" H 6250 3875 50  0001 C CNN
+F 3 "~" H 6250 3875 50  0001 C CNN
+	1    6250 3875
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:LED_Small D6
+U 1 1 607BBFB9
+P 5850 3875
+F 0 "D6" H 5900 3900 25  0000 L CNN
+F 1 "LED_Yellow" H 5900 3850 25  0000 L CNN
+F 2 "LED_THT:LED_D5.0mm" V 5850 3875 50  0001 C CNN
+F 3 "~" V 5850 3875 50  0001 C CNN
+	1    5850 3875
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5450 3875 5750 3875
+Wire Wire Line
+	5950 3875 6150 3875
+Wire Wire Line
+	6350 3875 6450 3875
+$Comp
+L Device:R_Small R7
+U 1 1 607BCF35
+P 6250 3975
+F 0 "R7" V 6225 4050 25  0000 L CNN
+F 1 "1K" V 6250 3975 25  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" H 6250 3975 50  0001 C CNN
+F 3 "~" H 6250 3975 50  0001 C CNN
+	1    6250 3975
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:LED_Small D7
+U 1 1 607BCF3B
+P 5850 3975
+F 0 "D7" H 5900 4000 25  0000 L CNN
+F 1 "LED_Red" H 5900 3950 25  0000 L CNN
+F 2 "LED_THT:LED_D5.0mm" V 5850 3975 50  0001 C CNN
+F 3 "~" V 5850 3975 50  0001 C CNN
+	1    5850 3975
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5450 3975 5750 3975
+Wire Wire Line
+	5950 3975 6150 3975
+Wire Wire Line
+	6350 3975 6450 3975
+$Comp
+L Device:R_Small R8
+U 1 1 607C1161
+P 6250 4075
+F 0 "R8" V 6225 4150 25  0000 L CNN
+F 1 "1K" V 6250 4075 25  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" H 6250 4075 50  0001 C CNN
+F 3 "~" H 6250 4075 50  0001 C CNN
+	1    6250 4075
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:LED_Small D8
+U 1 1 607C1167
+P 5850 4075
+F 0 "D8" H 5900 4100 25  0000 L CNN
+F 1 "LED_Red" H 5900 4050 25  0000 L CNN
+F 2 "LED_THT:LED_D5.0mm" V 5850 4075 50  0001 C CNN
+F 3 "~" V 5850 4075 50  0001 C CNN
+	1    5850 4075
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5450 4075 5750 4075
+Wire Wire Line
+	5950 4075 6150 4075
+Wire Wire Line
+	6350 4075 6450 4075
+Wire Wire Line
+	6450 4075 6450 3975
+Connection ~ 6450 3475
+Wire Wire Line
+	6450 3475 6450 3375
+Connection ~ 6450 3575
+Wire Wire Line
+	6450 3575 6450 3475
+Connection ~ 6450 3675
+Wire Wire Line
+	6450 3675 6450 3575
+Connection ~ 6450 3775
+Wire Wire Line
+	6450 3775 6450 3675
+Connection ~ 6450 3875
+Wire Wire Line
+	6450 3875 6450 3775
+Connection ~ 6450 3975
+Wire Wire Line
+	6450 3975 6450 3875
+$Comp
+L Connector_Generic:Conn_01x05 J1
+U 1 1 6076A9A0
+P 2250 3775
+F 0 "J1" H 2168 3350 50  0000 C CNN
+F 1 "MCU_VIZ" H 2168 3441 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Horizontal" H 2250 3775 50  0001 C CNN
+F 3 "~" H 2250 3775 50  0001 C CNN
+	1    2250 3775
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	5450 3275 5550 3275
+Wire Wire Line
+	5550 2975 3350 2975
+Wire Wire Line
+	5550 3275 5550 2975
+Wire Wire Line
+	6450 4075 6450 4175
+Wire Wire Line
+	6450 4175 5550 4175
+Connection ~ 6450 4075
+Connection ~ 5550 4175
+$EndSCHEMATC

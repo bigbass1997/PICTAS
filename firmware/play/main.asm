@@ -338,6 +338,10 @@ NESMain:
     movlw   B'00001011'
     movwf   TRISA
     
+    ; === Load TAS Config ===
+    call    FlashLoadConfig
+    call    FlashLoadNextEvent
+    
     bcf	    PIN_UART_HOST
     
     movlb   0

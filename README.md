@@ -1,4 +1,4 @@
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![CERN License](https://img.shields.io/badge/license-CERN%20OHL--W--V2-blue)](license/cern_ohl_w_v2.txt)
 ### Description
 The PICTAS is a device used to replay Tool-Assisted-Speedruns (aka Tool-Assisted-Superruns) on physical hardware. It currently has single controller support for the N64 and NES consoles, with plans to support more.
 
@@ -32,6 +32,11 @@ Each command is made up of a 3 byte wide number, which specifies the frame numbe
 
 0xFF | Null
 ```
+
+### Input Displays
+This replay device also supports input displays (aka viz boards), which enable the viewers to see which inputs are being pressed in real time, using LEDs, a shift register, and a current driver.
+
+The displays are designed to be placed on a SPI bus, which each display board shares the same clock and serial signals. Each device uses it's own Chip Select signal as a data latch.
 
 ### Discord/Support
 If you have questions or suggestions, you can find me on the [N64brew Discord server](https://discord.gg/WqFgNWf) or the [TASBot server](https://discord.tas.bot/).
