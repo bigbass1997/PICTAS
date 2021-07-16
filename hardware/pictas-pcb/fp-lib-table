@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name pictas)(type KiCad)(uri ${KIPRJMOD}/pictas.pretty)(options "")(descr ""))
+)

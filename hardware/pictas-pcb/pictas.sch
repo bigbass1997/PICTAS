@@ -27,7 +27,6 @@ Wire Wire Line
 	13550 5375 13650 5375
 Wire Wire Line
 	13550 5475 13750 5475
-NoConn ~ 11950 6775
 NoConn ~ 13550 5625
 NoConn ~ 13550 5725
 Wire Wire Line
@@ -162,7 +161,7 @@ SER
 Text Label 2725 9850 0    50   ~ 0
 CLK
 Text Label 2725 9950 0    50   ~ 0
-STROBE3
+STROBE4
 Wire Bus Line
 	3250 6800 3875 6800
 Entry Wire Line
@@ -208,7 +207,7 @@ SER
 Text Label 2725 8950 0    50   ~ 0
 CLK
 Text Label 2725 9050 0    50   ~ 0
-STROBE2
+STROBE3
 Entry Wire Line
 	3150 9050 3250 8950
 Entry Wire Line
@@ -242,7 +241,7 @@ SER
 Text Label 2725 8050 0    50   ~ 0
 CLK
 Text Label 2725 8150 0    50   ~ 0
-STROBE1
+STROBE2
 Entry Wire Line
 	3150 8150 3250 8050
 Entry Wire Line
@@ -274,7 +273,7 @@ SER
 Text Label 2725 7150 0    50   ~ 0
 CLK
 Text Label 2725 7250 0    50   ~ 0
-STROBE0
+STROBE1
 Entry Wire Line
 	3150 7250 3250 7150
 Entry Wire Line
@@ -342,13 +341,13 @@ Wire Wire Line
 Wire Wire Line
 	3975 8525 4900 8525
 Text Label 3975 8325 0    50   ~ 0
-STROBE0
-Text Label 3975 8425 0    50   ~ 0
 STROBE1
-Text Label 3975 8525 0    50   ~ 0
+Text Label 3975 8425 0    50   ~ 0
 STROBE2
-Text Label 3975 8625 0    50   ~ 0
+Text Label 3975 8525 0    50   ~ 0
 STROBE3
+Text Label 3975 8625 0    50   ~ 0
+STROBE4
 Wire Wire Line
 	4900 8625 3975 8625
 Wire Wire Line
@@ -361,8 +360,6 @@ Wire Wire Line
 	6500 8075 6725 8075
 Wire Wire Line
 	6725 8075 6725 7550
-Wire Wire Line
-	4800 7650 5500 7650
 Connection ~ 14825 4025
 Wire Wire Line
 	6150 10175 6250 10175
@@ -452,7 +449,7 @@ L Connector_Generic:Conn_01x05 J8
 U 1 1 60D21F3A
 P 2525 7150
 F 0 "J8" H 2600 7300 50  0000 L CNN
-F 1 "VizBoard0" H 2600 7375 50  0000 L CNN
+F 1 "VIZ_BOARD_1" H 2600 7375 50  0000 L CNN
 F 2 "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Horizontal" H 2525 7150 50  0001 C CNN
 F 3 "~" H 2525 7150 50  0001 C CNN
 	1    2525 7150
@@ -463,7 +460,7 @@ L Connector_Generic:Conn_01x05 J9
 U 1 1 60D21F23
 P 2525 8050
 F 0 "J9" H 2600 8200 50  0000 L CNN
-F 1 "VizBoard1" H 2600 8275 50  0000 L CNN
+F 1 "VIZ_BOARD_2" H 2600 8275 50  0000 L CNN
 F 2 "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Horizontal" H 2525 8050 50  0001 C CNN
 F 3 "~" H 2525 8050 50  0001 C CNN
 	1    2525 8050
@@ -474,7 +471,7 @@ L Connector_Generic:Conn_01x05 J10
 U 1 1 60D1178C
 P 2525 8950
 F 0 "J10" H 2600 9100 50  0000 L CNN
-F 1 "VizBoard2" H 2600 9175 50  0000 L CNN
+F 1 "VIZ_BOARD_3" H 2600 9175 50  0000 L CNN
 F 2 "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Horizontal" H 2525 8950 50  0001 C CNN
 F 3 "~" H 2525 8950 50  0001 C CNN
 	1    2525 8950
@@ -485,55 +482,11 @@ L Connector_Generic:Conn_01x05 J11
 U 1 1 60BFFA06
 P 2525 9850
 F 0 "J11" H 2600 10000 50  0000 L CNN
-F 1 "VizBoard3" H 2600 10075 50  0000 L CNN
+F 1 "VIZ_BOARD_4" H 2600 10075 50  0000 L CNN
 F 2 "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Horizontal" H 2525 9850 50  0001 C CNN
 F 3 "~" H 2525 9850 50  0001 C CNN
 	1    2525 9850
 	-1   0    0    1   
-$EndComp
-$Comp
-L pictas:MCP2221A U5
-U 1 1 608622B4
-P 5700 10175
-F 0 "U5" H 5700 9500 50  0000 C CNN
-F 1 "MCP2221A" H 5700 9600 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 5700 10175 50  0001 C CNN
-F 3 "" H 5750 9725 50  0001 C CNN
-	1    5700 10175
-	1    0    0    -1  
-$EndComp
-$Comp
-L pictas:PIC18F27K42 U3
-U 1 1 608227C0
-P 5700 8725
-F 0 "U3" H 5700 9740 50  0000 C CNN
-F 1 "PIC18F27K42" H 5700 9649 50  0000 C CNN
-F 2 "Package_DIP:DIP-28_W7.62mm" H 5700 8725 50  0001 C CNN
-F 3 "" H 5750 8275 50  0001 C CNN
-	1    5700 8725
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector_Generic:Conn_01x05 J5
-U 1 1 609C00CE
-P 5700 7050
-F 0 "J5" V 5625 6750 50  0000 R CNN
-F 1 "ICSP_VIZ" V 5700 6750 50  0000 R CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical" H 5700 7050 50  0001 C CNN
-F 3 "~" H 5700 7050 50  0001 C CNN
-	1    5700 7050
-	0    -1   -1   0   
-$EndComp
-$Comp
-L pictas-rescue:PIC18LF47K42-pictas U1
-U 1 1 5FCC6CF9
-P 12750 6475
-F 0 "U1" H 12750 7840 50  0000 C CNN
-F 1 "PIC18LF47K42" H 12750 7749 50  0000 C CNN
-F 2 "Package_DIP:DIP-40_W15.24mm" H 12800 6375 50  0001 C CNN
-F 3 "" H 12800 6375 50  0001 C CNN
-	1    12750 6475
-	1    0    0    -1  
 $EndComp
 $Comp
 L pictas-rescue:W25Q128JVS_PinAligned-Memory_Flash U2
@@ -551,7 +504,7 @@ L Connector:Barrel_Jack_Switch J16
 U 1 1 60CA6308
 P 1200 10100
 F 0 "J16" H 1400 9825 50  0000 R CNN
-F 1 "LED_Power_Jack" H 1400 9900 50  0000 R CNN
+F 1 "LED POWER" H 1400 9900 50  0000 R CNN
 F 2 "Connector_BarrelJack:BarrelJack_Horizontal" H 1250 10060 50  0001 C CNN
 F 3 "~" H 1250 10060 50  0001 C CNN
 	1    1200 10100
@@ -638,10 +591,10 @@ U 1 1 5FCC9332
 P 12750 4450
 F 0 "J6" V 12675 4150 50  0000 R CNN
 F 1 "ICSP_PLAY" V 12750 4150 50  0000 R CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical" H 12750 4450 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Horizontal" H 12750 4450 50  0001 C CNN
 F 3 "~" H 12750 4450 50  0001 C CNN
 	1    12750 4450
-	0    -1   -1   0   
+	0    1    -1   0   
 $EndComp
 Text Label 11950 6275 2    50   ~ 0
 UART-->
@@ -926,37 +879,37 @@ Entry Wire Line
 Wire Wire Line
 	10775 6875 11950 6875
 Text Label 11475 5525 2    50   ~ 0
-DB21
+DSUB21
 Text Label 11475 5625 2    50   ~ 0
-DB22
+DSUB22
 Text Label 11475 5725 2    50   ~ 0
-DB23
+DSUB23
 Text Label 11475 5825 2    50   ~ 0
-DB24
+DSUB24
 Text Label 11475 5925 2    50   ~ 0
-DB25
+DSUB25
 Entry Wire Line
 	10675 5925 10775 6025
 Wire Wire Line
 	10775 6025 11950 6025
 Text Label 11475 6025 2    50   ~ 0
-DB26
+DSUB26
 Text Label 11475 6875 2    50   ~ 0
-DB27
+DSUB27
 Text Label 11475 7025 2    50   ~ 0
-DB11
+DSUB11
 Text Label 11475 7125 2    50   ~ 0
-DB12
+DSUB12
 Text Label 11475 7225 2    50   ~ 0
-DB13
+DSUB13
 Text Label 11475 7325 2    50   ~ 0
-DB14
+DSUB14
 Text Label 14025 7125 0    50   ~ 0
-DB17
+DSUB17
 Text Label 14025 7225 0    50   ~ 0
-DB16
+DSUB16
 Text Label 14025 7325 0    50   ~ 0
-DB15
+DSUB15
 $Comp
 L Connector_Generic:Conn_02x07_Odd_Even J1
 U 1 1 61B12EC9
@@ -1092,7 +1045,7 @@ L Connector_Generic:Conn_02x09_Odd_Even J4
 U 1 1 61CE12DE
 P 8750 1200
 F 0 "J4" H 8800 1825 50  0000 C CNN
-F 1 "DB1/2" H 8800 1725 50  0000 C CNN
+F 1 "DSUB1/2" H 8800 1725 50  0000 C CNN
 F 2 "Connector_PinHeader_2.54mm:PinHeader_2x09_P2.54mm_Horizontal" H 8750 1200 50  0001 C CNN
 F 3 "~" H 8750 1200 50  0001 C CNN
 	1    8750 1200
@@ -1374,19 +1327,19 @@ Entry Wire Line
 Text Label 8550 1500 2    50   ~ 0
 5V
 Text Label 8550 1400 2    50   ~ 0
-DB11
+DSUB11
 Text Label 8550 1300 2    50   ~ 0
-DB12
+DSUB12
 Text Label 8550 1200 2    50   ~ 0
-DB13
+DSUB13
 Text Label 8550 1100 2    50   ~ 0
-DB14
+DSUB14
 Text Label 8550 1000 2    50   ~ 0
-DB15
+DSUB15
 Text Label 8550 900  2    50   ~ 0
-DB16
+DSUB16
 Text Label 8550 800  2    50   ~ 0
-DB17
+DSUB17
 Wire Wire Line
 	9050 1400 9450 1400
 Entry Wire Line
@@ -1422,19 +1375,19 @@ Entry Wire Line
 Text Label 9050 1500 0    50   ~ 0
 5V
 Text Label 9050 1400 0    50   ~ 0
-DB21
+DSUB21
 Text Label 9050 1300 0    50   ~ 0
-DB22
+DSUB22
 Text Label 9050 1200 0    50   ~ 0
-DB23
+DSUB23
 Text Label 9050 1100 0    50   ~ 0
-DB24
+DSUB24
 Text Label 9050 1000 0    50   ~ 0
-DB25
+DSUB25
 Text Label 9050 900  0    50   ~ 0
-DB26
+DSUB26
 Text Label 9050 800  0    50   ~ 0
-DB27
+DSUB27
 Wire Bus Line
 	3250 2100 3550 2100
 Connection ~ 3550 2100
@@ -1595,32 +1548,6 @@ F 3 "" H 11850 6625 50  0001 C CNN
 	1    11850 6625
 	0    1    1    0   
 $EndComp
-Wire Bus Line
-	10075 700  10075 2100
-Wire Bus Line
-	9550 800  9550 2100
-Wire Bus Line
-	8050 800  8050 2100
-Wire Bus Line
-	7750 1400 7750 2100
-Wire Bus Line
-	5800 1400 5800 2100
-Wire Bus Line
-	5500 1400 5500 2100
-Wire Bus Line
-	3550 1400 3550 2100
-Wire Bus Line
-	1400 1025 1400 2100
-Wire Bus Line
-	3250 1025 3250 2100
-Wire Bus Line
-	3250 6800 3250 9950
-Wire Bus Line
-	3875 6800 3875 9275
-Wire Bus Line
-	14825 4025 14825 7575
-Wire Bus Line
-	10675 4025 10675 9400
 $Comp
 L power:GND #PWR010
 U 1 1 621721F2
@@ -1670,4 +1597,361 @@ $EndComp
 Connection ~ 14625 6275
 Wire Wire Line
 	14625 6275 14625 6375
+$Comp
+L pictas:LM1881 U6
+U 1 1 60F50A3C
+P 13975 9200
+F 0 "U6" H 13975 9615 50  0000 C CNN
+F 1 "LM1881" H 13975 9524 50  0000 C CNN
+F 2 "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm" H 13975 9200 50  0001 C CNN
+F 3 "" H 13975 9200 50  0001 C CNN
+	1    13975 9200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	14475 9025 14575 9025
+$Comp
+L power:VDD #PWR014
+U 1 1 60F753EE
+P 14575 9025
+F 0 "#PWR014" H 14575 8875 50  0001 C CNN
+F 1 "VDD" V 14575 9150 50  0000 L CNN
+F 2 "" H 14575 9025 50  0001 C CNN
+F 3 "" H 14575 9025 50  0001 C CNN
+	1    14575 9025
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	13475 9325 13375 9325
+$Comp
+L power:GND #PWR013
+U 1 1 60F8C67B
+P 13375 9325
+F 0 "#PWR013" H 13375 9075 50  0001 C CNN
+F 1 "GND" V 13380 9197 50  0000 R CNN
+F 2 "" H 13375 9325 50  0001 C CNN
+F 3 "" H 13375 9325 50  0001 C CNN
+	1    13375 9325
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:C_Small C5
+U 1 1 60FBD1DD
+P 15250 9075
+F 0 "C5" V 15200 9125 38  0000 L CNN
+F 1 "0.1uF" V 15200 8875 38  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D3.4mm_W2.1mm_P2.50mm" H 15250 9075 50  0001 C CNN
+F 3 "~" H 15250 9075 50  0001 C CNN
+	1    15250 9075
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:C_Small C4
+U 1 1 60FBE3EC
+P 13125 9125
+F 0 "C4" V 13075 9175 38  0000 L CNN
+F 1 "0.1uF" V 13175 9175 38  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D3.4mm_W2.1mm_P2.50mm" H 13125 9125 50  0001 C CNN
+F 3 "~" H 13125 9125 50  0001 C CNN
+	1    13125 9125
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	13225 9125 13475 9125
+Wire Wire Line
+	11950 6775 11850 6775
+Text GLabel 11850 6775 0    50   Input ~ 0
+ALT_CLK
+Text GLabel 12925 9225 0    50   Output ~ 0
+ALT_CLK
+Wire Wire Line
+	13475 9225 12925 9225
+$Comp
+L Device:R_Small R7
+U 1 1 6107C53C
+P 15250 9225
+F 0 "R7" V 15200 9150 38  0000 R CNN
+F 1 "680k" V 15325 9225 38  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" H 15250 9225 50  0001 C CNN
+F 3 "~" H 15250 9225 50  0001 C CNN
+	1    15250 9225
+	0    -1   1    0   
+$EndComp
+Wire Wire Line
+	15150 9075 15050 9075
+Wire Wire Line
+	15050 9075 15050 9225
+Wire Wire Line
+	15050 9225 15150 9225
+Wire Wire Line
+	15050 9225 14475 9225
+Connection ~ 15050 9225
+Wire Wire Line
+	15350 9075 15500 9075
+Wire Wire Line
+	15500 9075 15500 9225
+Wire Wire Line
+	15500 9225 15350 9225
+Wire Wire Line
+	15500 9225 15600 9225
+Connection ~ 15500 9225
+$Comp
+L power:GND #PWR015
+U 1 1 61160B5C
+P 15600 9225
+F 0 "#PWR015" H 15600 8975 50  0001 C CNN
+F 1 "GND" V 15605 9097 50  0000 R CNN
+F 2 "" H 15600 9225 50  0001 C CNN
+F 3 "" H 15600 9225 50  0001 C CNN
+	1    15600 9225
+	0    -1   -1   0   
+$EndComp
+NoConn ~ 14475 9325
+NoConn ~ 13475 9025
+Text GLabel 14575 9125 2    50   Output ~ 0
+OEOUT
+Wire Wire Line
+	14475 9125 14575 9125
+Text GLabel 13650 7575 2    50   Input ~ 0
+OEOUT
+Wire Wire Line
+	13550 7575 13650 7575
+$Comp
+L Connector_Generic:Conn_01x03 J14
+U 1 1 6121888F
+P 13225 9700
+F 0 "J14" H 13300 9675 50  0000 L CNN
+F 1 "SYNC" H 13300 9750 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Horizontal" H 13225 9700 50  0001 C CNN
+F 3 "~" H 13225 9700 50  0001 C CNN
+	1    13225 9700
+	1    0    0    1   
+$EndComp
+Wire Wire Line
+	12350 9125 12450 9125
+Wire Wire Line
+	13025 9700 12925 9700
+Text GLabel 12925 9700 0    50   BiDi ~ 0
+ALT_CLK
+Text GLabel 12925 9800 0    50   Input ~ 0
+OEOUT
+Wire Wire Line
+	13025 9800 12925 9800
+Wire Wire Line
+	12450 9125 12450 9600
+Wire Wire Line
+	12450 9600 13025 9600
+Connection ~ 12450 9125
+Wire Wire Line
+	12450 9125 13025 9125
+Text Label 12925 9600 2    50   ~ 0
+CVIN
+$Comp
+L pictas:PJRAN1X1U04X J13
+U 1 1 6130565E
+P 12050 9025
+F 0 "J13" H 12025 8775 50  0000 C CNN
+F 1 "RCA Input" H 12025 8850 50  0000 C CNN
+F 2 "pictas:PJRAN1X1U04X" H 12050 9000 50  0001 C BNN
+F 3 "" H 12050 9025 50  0001 L BNN
+	1    12050 9025
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0102
+U 1 1 61349AB8
+P 12550 8925
+F 0 "#PWR0102" H 12550 8675 50  0001 C CNN
+F 1 "GND" V 12555 8797 50  0000 R CNN
+F 2 "" H 12550 8925 50  0001 C CNN
+F 3 "" H 12550 8925 50  0001 C CNN
+	1    12550 8925
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	12350 8925 12450 8925
+Wire Wire Line
+	12450 8925 12450 9025
+Wire Wire Line
+	12450 8925 12550 8925
+Wire Wire Line
+	12450 9025 12350 9025
+Connection ~ 12450 8925
+$Comp
+L pictas:MCP2221A U5
+U 1 1 608622B4
+P 5700 10175
+F 0 "U5" H 5700 9500 50  0000 C CNN
+F 1 "MCP2221A" H 5700 9600 50  0000 C CNN
+F 2 "Package_DIP:DIP-14_W7.62mm" H 5700 10175 50  0001 C CNN
+F 3 "" H 5750 9725 50  0001 C CNN
+	1    5700 10175
+	1    0    0    -1  
+$EndComp
+$Comp
+L pictas:PIC18F27K42 U3
+U 1 1 608227C0
+P 5700 8725
+F 0 "U3" H 5700 9740 50  0000 C CNN
+F 1 "PIC18F27K42" H 5700 9649 50  0000 C CNN
+F 2 "Package_DIP:DIP-28_W7.62mm" H 5700 8725 50  0001 C CNN
+F 3 "" H 5750 8275 50  0001 C CNN
+	1    5700 8725
+	1    0    0    -1  
+$EndComp
+$Comp
+L pictas-rescue:PIC18LF47K42-pictas U1
+U 1 1 5FCC6CF9
+P 12750 6475
+F 0 "U1" H 12750 7840 50  0000 C CNN
+F 1 "PIC18LF47K42" H 12750 7749 50  0000 C CNN
+F 2 "Package_DIP:DIP-40_W15.24mm" H 12800 6375 50  0001 C CNN
+F 3 "" H 12800 6375 50  0001 C CNN
+	1    12750 6475
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_Push SW1
+U 1 1 6145D3D9
+P 5700 6250
+F 0 "SW1" H 5700 6535 50  0000 C CNN
+F 1 "MCU_RESET" H 5700 6444 50  0000 C CNN
+F 2 "Button_Switch_THT:SW_PUSH_6mm_H7.3mm" H 5700 6450 50  0001 C CNN
+F 3 "~" H 5700 6450 50  0001 C CNN
+	1    5700 6250
+	1    0    0    -1  
+$EndComp
+$Comp
+L dk_Transistors-Bipolar-BJT-Single:KSC1815YTA Q1
+U 1 1 61469F6C
+P 5700 5400
+F 0 "Q1" V 5941 5400 60  0000 C CNN
+F 1 "KSC1815_CON_RESET" V 6047 5400 60  0000 C CNN
+F 2 "digikey-footprints:TO-92-3_Formed_Leads" H 5900 5600 60  0001 L CNN
+F 3 "https://www.onsemi.com/pub/Collateral/KSC1815-D.pdf" H 5900 5700 60  0001 L CNN
+F 4 "KSC1815YTACT-ND" H 5900 5800 60  0001 L CNN "Digi-Key_PN"
+F 5 "KSC1815YTA" H 5900 5900 60  0001 L CNN "MPN"
+F 6 "Discrete Semiconductor Products" H 5900 6000 60  0001 L CNN "Category"
+F 7 "Transistors - Bipolar (BJT) - Single" H 5900 6100 60  0001 L CNN "Family"
+F 8 "https://www.onsemi.com/pub/Collateral/KSC1815-D.pdf" H 5900 6200 60  0001 L CNN "DK_Datasheet_Link"
+F 9 "/product-detail/en/on-semiconductor/KSC1815YTA/KSC1815YTACT-ND/3908203" H 5900 6300 60  0001 L CNN "DK_Detail_Page"
+F 10 "TRANS NPN 50V 0.15A TO-92" H 5900 6400 60  0001 L CNN "Description"
+F 11 "ON Semiconductor" H 5900 6500 60  0001 L CNN "Manufacturer"
+F 12 "Active" H 5900 6600 60  0001 L CNN "Status"
+	1    5700 5400
+	0    1    1    0   
+$EndComp
+$Comp
+L power:GND #PWR012
+U 1 1 614904F1
+P 5400 6250
+F 0 "#PWR012" H 5400 6000 50  0001 C CNN
+F 1 "GND" V 5405 6122 50  0000 R CNN
+F 2 "" H 5400 6250 50  0001 C CNN
+F 3 "" H 5400 6250 50  0001 C CNN
+	1    5400 6250
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	5500 6250 5400 6250
+Text GLabel 6000 6250 2    50   BiDi ~ 0
+MCU_RESET
+Wire Wire Line
+	6000 6250 5900 6250
+Text GLabel 4800 7550 1    50   BiDi ~ 0
+MCU_RESET
+Wire Wire Line
+	4800 7550 4800 7650
+Wire Wire Line
+	4800 7650 5500 7650
+Text GLabel 11850 4950 1    50   BiDi ~ 0
+MCU_RESET
+Wire Wire Line
+	11850 4950 11850 5050
+Text GLabel 11850 7575 0    50   Output ~ 0
+CON_RESET
+Wire Wire Line
+	11850 7575 11950 7575
+Text GLabel 5700 5100 1    50   Input ~ 0
+CON_RESET
+Wire Wire Line
+	5500 5500 5400 5500
+$Comp
+L power:VDD #PWR016
+U 1 1 6159C3EC
+P 5400 5500
+F 0 "#PWR016" H 5400 5350 50  0001 C CNN
+F 1 "VDD" V 5400 5625 50  0000 L CNN
+F 2 "" H 5400 5500 50  0001 C CNN
+F 3 "" H 5400 5500 50  0001 C CNN
+	1    5400 5500
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	5700 5100 5700 5200
+$Comp
+L Connector_Generic:Conn_01x02 J15
+U 1 1 615DDAF8
+P 6600 5400
+F 0 "J15" H 6680 5392 50  0000 L CNN
+F 1 "CON_RESET" H 6680 5301 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Horizontal" H 6600 5400 50  0001 C CNN
+F 3 "~" H 6600 5400 50  0001 C CNN
+	1    6600 5400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5900 5500 6400 5500
+$Comp
+L power:GND #PWR017
+U 1 1 615FC9AA
+P 6300 5400
+F 0 "#PWR017" H 6300 5150 50  0001 C CNN
+F 1 "GND" V 6305 5272 50  0000 R CNN
+F 2 "" H 6300 5400 50  0001 C CNN
+F 3 "" H 6300 5400 50  0001 C CNN
+	1    6300 5400
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	6400 5400 6300 5400
+NoConn ~ 11950 7475
+NoConn ~ 13550 7475
+$Comp
+L Connector_Generic:Conn_01x05 J5
+U 1 1 609C00CE
+P 5700 7050
+F 0 "J5" V 5625 6750 50  0000 R CNN
+F 1 "ICSP_VIZ" V 5700 6750 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Horizontal" H 5700 7050 50  0001 C CNN
+F 3 "~" H 5700 7050 50  0001 C CNN
+	1    5700 7050
+	0    1    -1   0   
+$EndComp
+Wire Bus Line
+	3550 1400 3550 2100
+Wire Bus Line
+	5500 1400 5500 2100
+Wire Bus Line
+	5800 1400 5800 2100
+Wire Bus Line
+	7750 1400 7750 2100
+Wire Bus Line
+	3875 6800 3875 9275
+Wire Bus Line
+	3250 1025 3250 2100
+Wire Bus Line
+	1400 1025 1400 2100
+Wire Bus Line
+	10075 700  10075 2100
+Wire Bus Line
+	9550 800  9550 2100
+Wire Bus Line
+	8050 800  8050 2100
+Wire Bus Line
+	14825 4025 14825 7575
+Wire Bus Line
+	3250 6800 3250 9950
+Wire Bus Line
+	10675 4025 10675 9400
 $EndSCHEMATC
