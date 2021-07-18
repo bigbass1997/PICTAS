@@ -317,7 +317,31 @@ ContinueLFNL:
     
 ;;;;;====================== NES Main Logic ======================;;;;;
 NESMain:
+    ; === Load TAS Config ===
+    movlb   0
+    call    FlashLoadConfig
+    call    FlashLoadNextEvent
+    
+    bcf	    PIN_UART_HOST
+    
     call    FlashPrepareReadZero
+    
+    movlw   H'FF'
+    call    FlashReadNextNES
+    movffl  NES_STATE_REG1, U1TXB
+    movffl  NES_STATE_REG2, U1TXB
+    
+    call    CheckResetNES
+    
+    incfsz  CUR_INPUT_LOW, 1
+    goto    NESMain_IncEnd
+    
+    incfsz  CUR_INPUT_MID, 1
+    goto    NESMain_IncEnd
+    
+    incf    CUR_INPUT_HIGH, 1
+NESMain_IncEnd:
+    
     
     BANKSEL INTCON0
     bcf	    INTCON0, GIE    ; Temporarily disable global interrupt bit
@@ -337,31 +361,6 @@ NESMain:
     BANKSEL TRISA
     movlw   B'00001011'
     movwf   TRISA
-    
-    ; === Load TAS Config ===
-    call    FlashLoadConfig
-    call    FlashLoadNextEvent
-    
-    bcf	    PIN_UART_HOST
-    
-    movlb   0
-    call    CheckResetNES
-    
-    movlw   H'FF'
-    call    FlashReadNextNES
-    movffl  NES_STATE_REG1, U1TXB
-    movffl  NES_STATE_REG2, U1TXB
-    
-    call    CheckResetNES
-    
-    incfsz  CUR_INPUT_LOW, 1
-    goto    NESMain_IncEnd
-    
-    incfsz  CUR_INPUT_MID, 1
-    goto    NESMain_IncEnd
-    
-    incf    CUR_INPUT_HIGH, 1
-NESMain_IncEnd:
     
     
 NESMain_Loop:

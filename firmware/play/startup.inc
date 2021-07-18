@@ -84,6 +84,7 @@
     bsf     PIN_FLASH_CS
     bcf	    PIN_STAT_LED
     bcf	    PIN_CON_RESET
+    bsf	    PIN_UART_HOST
     
     ; === Enable SPI ===
     movlb   B'111101'   ; Bank 61
@@ -149,11 +150,6 @@
     ; This is done to avoid accidental interrupts on irrelevant consoles.
     
     
-    ; === Load TAS Config ===
-    call    FlashLoadConfig
-    call    FlashLoadNextEvent
-    
-    bsf	    PIN_UART_HOST
     
     
     
