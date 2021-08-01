@@ -58,40 +58,43 @@ ListenUSBCommands:
 USBRX_Ping: ; 0x01
     movlw   H'EE'
     movffl  WREG, U1TXB
+    movlw   H'EA'
+    movffl  WREG, U1TXB
     goto    ListenUSBCommands
     
     ;;;;==================================================================;;;;
 USBRX_Dump: ; 0x02 ; This will dump the entire FLASH memory back to host, via USB
     call    FlashWaitBusy
-    call    FlashPrepareReadZero
-    BANKSEL ZEROS_REG
-    clrf    FLASH_ADDR_HIGH
-    clrf    FLASH_ADDR_MID
-    clrf    FLASH_ADDR_LOW
-    
-USBRX_Dump_Loop:
-    call    FlashReadNext
-    movffl  WREG, U1TXB
-    ;wait here
-    wait D'255'
-    wait D'63'
-    
-    infsnz  FLASH_ADDR_LOW
-    goto    USBRX_Dump_IncLow
-    goto    USBRX_Dump_Loop
-    
-USBRX_Dump_IncLow:
-    infsnz  FLASH_ADDR_MID
-    goto    USBRX_Dump_IncMid
-    goto    USBRX_Dump_Loop
-    
-USBRX_Dump_IncMid:
-    infsnz  FLASH_ADDR_HIGH
-    goto    USBRX_Dump_End
-    goto    USBRX_Dump_Loop
-    
-USBRX_Dump_End:
-    call    FlashReadEnd
+    call    FlashReadJEDEC
+;    call    FlashPrepareReadZero
+;    BANKSEL ZEROS_REG
+;    clrf    FLASH_ADDR_HIGH
+;    clrf    FLASH_ADDR_MID
+;    clrf    FLASH_ADDR_LOW
+;    
+;USBRX_Dump_Loop:
+;    call    FlashReadNext
+;    movffl  WREG, U1TXB
+;    ;wait here
+;    wait D'255'
+;    wait D'63'
+;    
+;    infsnz  FLASH_ADDR_LOW
+;    goto    USBRX_Dump_IncLow
+;    goto    USBRX_Dump_Loop
+;    
+;USBRX_Dump_IncLow:
+;    infsnz  FLASH_ADDR_MID
+;    goto    USBRX_Dump_IncMid
+;    goto    USBRX_Dump_Loop
+;    
+;USBRX_Dump_IncMid:
+;    infsnz  FLASH_ADDR_HIGH
+;    goto    USBRX_Dump_End
+;    goto    USBRX_Dump_Loop
+;    
+;USBRX_Dump_End:
+;    call    FlashReadEnd
     
     goto    ListenUSBCommands
     

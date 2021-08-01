@@ -28,6 +28,7 @@ FlashReset:
     
 FlashReadJEDEC:
     bcf	    PIN_FLASH_CS
+    wait D'16'
     
     movlw   H'9F'
     movffl  WREG, SPI1TXB
@@ -37,7 +38,13 @@ FlashReadJEDEC:
     nop
     nop
     movffl  SPI1RXB, U1TXB
+    ;movffl  SPI1RXB, WREG
+    ;xorlw   0xFF
+    ;movffl  WREG, U1TXB
     movffl  SPI1RXB, U1TXB
+    wait D'255'
+    wait D'255'
+    wait D'255'
     
     movffl  WREG, SPI1TXB
     movffl  WREG, SPI1TXB
@@ -122,13 +129,13 @@ FlashPrepareRead: ; Calling this label will start the read from FLASH_ADDR_HIGH/
     movlw   H'03'
     movffl  WREG, SPI1TXB
     movffl  FLASH_ADDR_HIGH, SPI1TXB
-    wait D'25'
+    wait D'35'
     movffl  SPI1RXB, JUNK_REG
     movffl  SPI1RXB, JUNK_REG
     
     movffl  FLASH_ADDR_MID, SPI1TXB
     movffl  FLASH_ADDR_LOW, SPI1TXB
-    wait D'25'
+    wait D'35'
     movffl  SPI1RXB, JUNK_REG
     movffl  SPI1RXB, JUNK_REG
     
@@ -149,8 +156,10 @@ FlashReadNext:
 FlashReadNextNES:
     movffl  WREG, SPI1TXB
     movffl  WREG, SPI1TXB
-    wait D'25'
+    wait D'42'
     movffl  SPI1RXB, NES_STATE_REG1
+    nop
+    nop
     movffl  SPI1RXB, NES_STATE_REG2
     
     call    IncrementFlashLast
@@ -294,7 +303,7 @@ FlashLoadConfig:
     BANKSEL FSR1L
 FLC_Loop:
     movffl  WREG, SPI1TXB
-    wait D'15'
+    wait D'35'
     movffl  SPI1RXB, POSTINC1
     
     tstfsz  FSR1L, 1	; skip next if FSR1L == zero
@@ -320,13 +329,13 @@ FlashLoadNextEvent:
     
     movffl  ZEROS_REG, SPI1TXB
     movffl  ZEROS_REG, SPI1TXB
-    wait D'25'
+    wait D'35'
     movffl  SPI1RXB, CFG_EVENT_HIGH
     movffl  SPI1RXB, CFG_EVENT_MID
     
     movffl  ZEROS_REG, SPI1TXB
     movffl  ZEROS_REG, SPI1TXB
-    wait D'25'
+    wait D'35'
     movffl  SPI1RXB, CFG_EVENT_LOW
     movffl  SPI1RXB, CFG_EVENT_CMD
     

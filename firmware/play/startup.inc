@@ -5,19 +5,19 @@
     
     ; === Peripheral Pin Select ===
     movlb   B'111010'   ; Bank 58
-    movlw   B'011111'
-    movwf   RC6PPS      ; Set SPI1SDO   to pin RC6
-    movlw   B'011110'
-    movwf   RC4PPS      ; Set SPI1SCK   to pin RC4
     movlw   B'010011'
-    movwf   RC3PPS      ; Set U1TX      to pin RC3
+    movwf   RB5PPS      ; Set U1TX      to pin RB5
+    movlw   B'011110'
+    movwf   RB2PPS      ; Set SPI1SCK   to pin RB2
+    movlw   B'011111'
+    movwf   RB3PPS      ; Set SPI1SDO   to pin RB3
     
-    movlw   B'010010'
-    movwf   U1RXPPS     ; Set U1RX      to pin RC2
-    movlw   B'010101'
-    movwf   SPI1SDIPPS  ; Set SPI1SDI   to pin RC5
-    movlw   B'001101'
-    movwf   INT0PPS	; Set INT0	to pin RB5
+;    movlw   B'001101'
+;    movwf   INT0PPS	; Set INT0	to pin RB5
+    movlw   B'001100'
+    movwf   U1RXPPS     ; Set U1RX      to pin RB4
+    movlw   B'001001'
+    movwf   SPI1SDIPPS  ; Set SPI1SDI   to pin RB1
     
     movlb   B'00000000'
     ; === Register Setup ===
@@ -48,24 +48,26 @@
     clrf    ANSELE
     
     ; 0 is output, 1 is input
-    movlw   B'11111111' ; Only <3,1-0> are used for NES inputs, but the others are cleared when a TAS begins
+    movlw   B'10111111'
     movwf   TRISA
     
-    movlw   B'00100000'
+    movlw   B'00110010'
     movwf   TRISB
     
-    movlw   B'00100100'
+    movlw   B'00000000'
     movwf   TRISC
     
-    movlw   B'00000010'
+    movlw   B'11110100'
     movwf   TRISD
     
-    movlw   B'00000000'
+    movlw   B'00000110'
     movwf   TRISE
     
-    bcf     SLRCONC, 6
-    bcf     SLRCONC, 5
-    bcf     SLRCONC, 4
+    setf    SLRCONB
+    bcf     SLRCONB, 3
+    bcf     SLRCONB, 2
+    bcf     SLRCONB, 1
+    ;bcf	    SLRCONB, 0
     
     clrf    LATA
     
@@ -84,7 +86,6 @@
     bsf     PIN_FLASH_CS
     bcf	    PIN_STAT_LED
     bcf	    PIN_CON_RESET
-    bsf	    PIN_UART_HOST
     
     ; === Enable SPI ===
     movlb   B'111101'   ; Bank 61
@@ -93,10 +94,11 @@
     movwf   SPI1BAUD        ; Set baud rate = ( 64000000 / (2 * (x + 1)) )
     bsf     SPI1CON0, MST
     bsf     SPI1CON0, BMODE
-    bsf     SPI1CON1, CKE   ; Clock Edge Select (0 = output data changes on idle to active)
-    bcf     SPI1CON1, CKP   ; Clock Polarity Select (0 = idle state of CLK is LOW)
+    bcf     SPI1CON1, CKE   ; Clock Edge Select (0 = output data changes on idle to active)
+    bsf     SPI1CON1, CKP   ; Clock Polarity Select (0 = idle state of CLK is LOW)
     bcf     SPI1CON1, SDIP  ; SDI Polarity (0 = active-high)
     bcf     SPI1CON1, SDOP  ; SDO Polarity (0 = active-high)
+    ;bsf	    SPI1CON1, SMP
     bsf     SPI1CON2, TXR   ; 1 = T1FIFO data is required for a transfer
     bsf     SPI1CON2, RXR   ; 1 = data transfer suspended if R1FIFO is full
     movlw   B'0001'
