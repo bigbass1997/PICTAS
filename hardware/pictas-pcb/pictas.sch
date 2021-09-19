@@ -475,8 +475,6 @@ NoConn ~ 6500 9375
 NoConn ~ 6500 9475
 Wire Wire Line
 	6500 8425 8325 8425
-Text GLabel 13650 5825 2    50   Input ~ 0
-SPI1SDI
 Wire Wire Line
 	13650 5825 13550 5825
 Wire Wire Line
@@ -487,11 +485,9 @@ Wire Wire Line
 	13550 6025 13650 6025
 Text GLabel 13650 5925 2    50   Output ~ 0
 SPI1SCK
-Text GLabel 13650 6125 2    50   Output ~ 0
-SPI1SDO
 Text GLabel 13650 6025 2    50   Output ~ 0
 SPI1CS
-Text GLabel 13350 8425 2    50   Output ~ 0
+Text GLabel 12150 8225 0    50   Output ~ 0
 SPI1SDI
 Wire Wire Line
 	13350 8425 13250 8425
@@ -501,7 +497,7 @@ Text GLabel 13350 8325 2    50   Input ~ 0
 SPI1SCK
 Text GLabel 12150 8125 0    50   Input ~ 0
 SPI1CS
-Text GLabel 12150 8225 0    50   Input ~ 0
+Text GLabel 13350 8425 2    50   Input ~ 0
 SPI1SDO
 Wire Wire Line
 	12150 8125 12250 8125
@@ -1868,11 +1864,11 @@ F 3 "~" H 14300 8225 50  0001 C CNN
 	1    14300 8225
 	-1   0    0    -1  
 $EndComp
-Text GLabel 14600 8125 2    50   Input ~ 0
+Text GLabel 14600 8425 2    50   Input ~ 0
 SPI1SDI
 Text GLabel 14600 8225 2    50   Output ~ 0
 SPI1SCK
-Text GLabel 14600 8425 2    50   Output ~ 0
+Text GLabel 14600 8125 2    50   Output ~ 0
 SPI1SDO
 Text GLabel 14600 8325 2    50   Output ~ 0
 SPI1CS
@@ -2032,10 +2028,10 @@ F 3 "" H 12150 8425 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L power:VDD #PWR?
+L power:VDD #PWR0103
 U 1 1 61481CA6
 P 13350 8225
-F 0 "#PWR?" H 13350 8075 50  0001 C CNN
+F 0 "#PWR0103" H 13350 8075 50  0001 C CNN
 F 1 "VDD" V 13350 8350 50  0000 L CNN
 F 2 "" H 13350 8225 50  0001 C CNN
 F 3 "" H 13350 8225 50  0001 C CNN
@@ -2074,10 +2070,10 @@ Connection ~ 13300 8125
 Wire Wire Line
 	13300 8125 13350 8125
 $Comp
-L power:GND #PWR?
+L power:GND #PWR0104
 U 1 1 615F22D9
 P 13350 7875
-F 0 "#PWR?" H 13350 7625 50  0001 C CNN
+F 0 "#PWR0104" H 13350 7625 50  0001 C CNN
 F 1 "GND" V 13355 7747 50  0000 R CNN
 F 2 "" H 13350 7875 50  0001 C CNN
 F 3 "" H 13350 7875 50  0001 C CNN
@@ -2114,4 +2110,8 @@ Wire Bus Line
 	3250 6800 3250 9950
 Wire Bus Line
 	10675 4025 10675 9400
+Text GLabel 13650 6125 2    50   Input ~ 0
+SPI1SDI
+Text GLabel 13650 5825 2    50   Output ~ 0
+SPI1SDO
 $EndSCHEMATC
