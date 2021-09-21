@@ -16,8 +16,8 @@
 ;    movwf   INT0PPS	; Set INT0	to pin RB5
     movlw   B'001100'
     movwf   U1RXPPS     ; Set U1RX      to pin RB4
-    movlw   B'001001'
-    movwf   SPI1SDIPPS  ; Set SPI1SDI   to pin RB1
+    movlw   B'001000'
+    movwf   SPI1SDIPPS  ; Set SPI1SDI   to pin RB0
     
     movlb   B'00000000'
     ; === Register Setup ===
@@ -48,10 +48,10 @@
     clrf    ANSELE
     
     ; 0 is output, 1 is input
-    movlw   B'10111111'
+    movlw   B'11111111'
     movwf   TRISA
     
-    movlw   B'00110010'
+    movlw   B'11010001'
     movwf   TRISB
     
     movlw   B'00000000'
@@ -67,9 +67,10 @@
     bcf     SLRCONB, 3
     bcf     SLRCONB, 2
     bcf     SLRCONB, 1
-    ;bcf	    SLRCONB, 0
+    bcf	    SLRCONB, 0
     
     clrf    LATA
+    setf    LATB
     
     BANKSEL ZEROS_REG
     clrf    N64_STATE_REG1
@@ -84,7 +85,7 @@
     
     bsf	    PIN_UART_HOST
     bsf     PIN_FLASH_CS
-    bcf	    PIN_STAT_LED
+    ;bcf	    PIN_STAT_LED
     bcf	    PIN_CON_RESET
     
     ; === Enable SPI ===
@@ -98,7 +99,7 @@
     bsf     SPI1CON1, CKP   ; Clock Polarity Select (0 = idle state of CLK is LOW)
     bcf     SPI1CON1, SDIP  ; SDI Polarity (0 = active-high)
     bcf     SPI1CON1, SDOP  ; SDO Polarity (0 = active-high)
-    ;bsf	    SPI1CON1, SMP
+    bsf	    SPI1CON1, SMP
     bsf     SPI1CON2, TXR   ; 1 = T1FIFO data is required for a transfer
     bsf     SPI1CON2, RXR   ; 1 = data transfer suspended if R1FIFO is full
     movlw   B'0001'

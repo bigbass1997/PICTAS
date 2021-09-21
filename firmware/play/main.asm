@@ -39,8 +39,8 @@ TMR0Vec	    code	0x0046	; (0x0008 + (2 * 31))
 
 #define	    PIN_NES_LATCH	PORTA, 0    ; Latch pins for each controller are connected at console-level
 
-#define     PIN_FLASH_CS        LATB,  0
-#define	    PIN_FLASH_CS_RD	PORTB, 0    ; Used to check what the last set state was
+#define     PIN_FLASH_CS        LATB,  1
+#define	    PIN_FLASH_CS_RD	PORTB, 1    ; Used to check what the last set state was
 
 #define	    PIN_UART_HOST	LATE,  2    ; Signal to MCU_Viz whether to write UART to host or not
 
