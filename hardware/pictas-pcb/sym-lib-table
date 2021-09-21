@@ -1,4 +1,4 @@
 (sym_lib_table
-  (lib (name pictas)(type Legacy)(uri ${KIPRJMOD}/pictas.lib)(options "")(descr ""))
-  (lib (name pictas-rescue)(type Legacy)(uri ${KIPRJMOD}/pictas-rescue.lib)(options "")(descr ""))
+  (lib (name "pictas")(type "KiCad")(uri "${KIPRJMOD}/pictas.kicad_sym")(options "")(descr ""))
+  (lib (name "pictas-rescue")(type "KiCad")(uri "${KIPRJMOD}/pictas-rescue.kicad_sym")(options "")(descr "")(disabled))
 )
