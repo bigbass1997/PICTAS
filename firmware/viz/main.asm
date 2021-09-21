@@ -2,7 +2,7 @@
     processor 18f27k42
     
     CONFIG WDTE = OFF
-    CONFIG DEBUG = ON
+   ; CONFIG DEBUG = ON
     CONFIG LVP = ON
     CONFIG MCLRE = EXTMCLR
     CONFIG MVECEN = ON ; Eanbles Interrupt Vector Table ; IVTBASE + 2*(vector number)

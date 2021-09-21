@@ -3,7 +3,7 @@
     processor 18f47k42
     
     CONFIG WDTE = OFF
-    CONFIG DEBUG = ON
+   ; CONFIG DEBUG = ON
     CONFIG LVP = ON
     CONFIG MCLRE = EXTMCLR
     CONFIG MVECEN = ON ; Eanbles Interrupt Vector Table ; IVTBASE + 2*(vector number)
@@ -39,17 +39,17 @@ TMR0Vec	    code	0x0046	; (0x0008 + (2 * 31))
 
 #define	    PIN_NES_LATCH	PORTA, 0    ; Latch pins for each controller are connected at console-level
 
-#define     PIN_FLASH_CS        LATC,  7
-#define	    PIN_FLASH_CS_RD	PORTC, 7    ; Used to check what the last set state was
+#define     PIN_FLASH_CS        LATB,  1
+#define	    PIN_FLASH_CS_RD	PORTB, 1    ; Used to check what the last set state was
 
-#define	    PIN_UART_HOST	LATC,  1    ; Signal to MCU_Viz whether to write UART to host or not
+#define	    PIN_UART_HOST	LATE,  2    ; Signal to MCU_Viz whether to write UART to host or not
 
-#define     PIN_N64_DATAIN      PORTD, 1
-#define     PIN_N64_DATAOUT     LATD,  1    ; LAT register is used for writing data out
-#define     TRIS_N64_DATA       TRISD, 1
+#define     PIN_N64_DATAIN      PORTD, 4
+#define     PIN_N64_DATAOUT     LATD,  4    ; LAT register is used for writing data out
+#define     TRIS_N64_DATA       TRISD, 4
 
-#define	    PIN_STAT_LED	LATE,  2    ; Status LED indicator
-#define	    PIN_CON_RESET	LATE,  1
+#define	    PIN_STAT_LED	LATD,  0    ; Status LED indicator
+#define	    PIN_CON_RESET	LATD,  1
 
 
 ; === REGISTERS ===

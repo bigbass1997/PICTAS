@@ -63,6 +63,7 @@ USBRX_Ping: ; 0x01
     ;;;;==================================================================;;;;
 USBRX_Dump: ; 0x02 ; This will dump the entire FLASH memory back to host, via USB
     call    FlashWaitBusy
+    ;call    FlashReadJEDEC
     call    FlashPrepareReadZero
     BANKSEL ZEROS_REG
     clrf    FLASH_ADDR_HIGH

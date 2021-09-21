@@ -44,7 +44,7 @@ NESMain_IncEnd:
     bsf	    INTCON0, GIE    ; Re-enabling global interrupt bit
     
     BANKSEL TRISA
-    movlw   B'00001011'
+    movlw   B'10001011'
     movwf   TRISA
     
     
