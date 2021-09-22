@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name "a2600-joystick-vizboard")(type "KiCad")(uri "${KIPRJMOD}/a2600-joystick-vizboard.kicad_sym")(options "")(descr ""))
+)
