@@ -60,7 +60,7 @@
     movlw   B'11110100'
     movwf   TRISD
     
-    movlw   B'00000110'
+    movlw   B'00000010'
     movwf   TRISE
     
     setf    SLRCONB
