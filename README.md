@@ -40,3 +40,5 @@ An auxilary power supply must be connected for these displays. The PCB design is
 
 ### Discord/Support
 If you have questions or suggestions, you can find me on the [N64brew Discord server](https://discord.gg/WqFgNWf) or the [TASBot server](https://discord.tas.bot/).
+
+![pcb design](hardware/pictas-pcb/pcb-preview.png)
