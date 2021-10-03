@@ -27,10 +27,10 @@ U2RXVec	    code	0x006C	; (0x0008 + (2 * 50))
 ; refer to pinout documentation for more information
 ; reminder: all button input pins should be pulled-DOWN (default state is cleared aka 0)
 ;           connect pin to power to set button to a "pressed" state
-#define	    PIN_STROBE0		LATA,  5
-#define	    PIN_STROBE1		LATA,  4
-#define	    PIN_STROBE2		LATA,  3
-#define	    PIN_STROBE3		LATA,  2
+#define	    PIN_STROBE3		LATA,  5
+#define	    PIN_STROBE2		LATA,  4
+#define	    PIN_STROBE1		LATA,  3
+#define	    PIN_STROBE0		LATA,  2
 
 #define	    PIN_UART_HOST	PORTB, 3
 
@@ -98,6 +98,9 @@ Setup:
     
     clrf    WREG
     call    WriteSPI_BUS0
+    call    WriteSPI_BUS1
+    call    WriteSPI_BUS2
+    call    WriteSPI_BUS3
     ;; debug end ;;
     
     
