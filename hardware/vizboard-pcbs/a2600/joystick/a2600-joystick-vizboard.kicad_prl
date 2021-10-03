@@ -76,24 +76,12 @@
         "name": "a2600-joystick-vizboard.kicad_pcb",
         "open": false,
         "window": {
-          "display": 0,
+          "display": 1,
           "maximized": true,
           "pos_x": 0,
-          "pos_y": 12,
+          "pos_y": -1,
           "size_x": 1920,
-          "size_y": 501
-        }
-      },
-      {
-        "name": "a2600-joystick-vizboard.kicad_sch",
-        "open": false,
-        "window": {
-          "display": 0,
-          "maximized": true,
-          "pos_x": 240,
-          "pos_y": 162,
-          "size_x": 1440,
-          "size_y": 731
+          "size_y": 955
         }
       }
     ]

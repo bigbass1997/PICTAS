@@ -71,19 +71,6 @@
     "version": 3
   },
   "project": {
-    "files": [
-      {
-        "name": "pictas.kicad_sch",
-        "open": false,
-        "window": {
-          "display": 0,
-          "maximized": true,
-          "pos_x": 240,
-          "pos_y": 162,
-          "size_x": 1440,
-          "size_y": 756
-        }
-      }
-    ]
+    "files": []
   }
 }
