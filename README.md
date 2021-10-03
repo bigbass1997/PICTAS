@@ -1,21 +1,19 @@
 [![CERN License](https://img.shields.io/badge/license-CERN%20OHL--W--V2-blue)](license/cern_ohl_w_v2.txt)
 ### Description
-The PICTAS is a device used to replay Tool-Assisted-Speedruns (aka Tool-Assisted-Superruns) on physical hardware. It currently has single controller support for the N64 and NES consoles, with plans to support more.
+The PICTAS is an input device used to replay Tool-Assisted-Speedruns (aka Tool-Assisted-Superruns) on physical hardware.
 
-A PIC18LF47K42 microcontroller is used as the brain of this device. While an ARM-based MCU could have been used instead, I already had prior experience with the PIC architecture and instruction set. Unlike other TAS replay devices, this one stores the entire movie's inputs on-board, using a serial flash memory IC (W25Q128JV), capable of storing 16 MB of input data. While this does have some minor drawbacks, it is far less susceptible to desyncs during playback. 
+A PIC18F47K42 microcontroller is used for the replay portion of the device, and the smaller PIC18F27K42 is used for controlling the input displays.
 
-While programming the inputs, the device will respond with each byte it recieved, so that the interface can detect any corrupted data. If programming is successful, you can re-run that TAS as many times as you want, without reprogramming, even if the device loses power; similar to how Flash Carts store save data.
+Unlike a typical TAS replay device, this one stores the TAS inputs on-board, using serial flash memory (W25Q128JVSIQ), capable of storing 16 MB of input data. The advantage is that USB communication is not required during replay. It simplifies the replay process, and greatly reduces the chance of corrupted inputs. Additionally, once programmed, the device can be used without a USB host computer (WIP feature).
 
-I also have plans to implement an on-board button that will initiate the movie playback. This will be useful, both for ease of use vs running a command, and more importantly, to allow playback without being connected to a host computer at all.
-
-This project is still just a prototype under heavy development. While I will offer help and support as best I can, please understand that significant code and design changes can occur at any time.
+This project is still a prototype under heavy development. While I will offer help and support as best I can, please understand that significant code and design changes can occur at any time.
 
 ### Usage
-The general process looks like this: Load movie into a [host interface](https://github.com/bigbass1997/pictas-interface-rs). Program the movie's inputs and config options onto the PICTAS device. Finally, run one of the available start methods to begin the playback.
+The general process looks like this: Load movie into a [host interface](https://github.com/bigbass1997/pictas-interface-rs). Program the movie's inputs and config options onto the PICTAS device. Finally, use one of the available start methods to begin the playback.
 
-Refer to the [PICTAS-Interface project](https://github.com/bigbass1997/pictas-interface-rs) for details on how to use that software. If you would like to make your own interface, you may do so. There will be docs provided here once the communication protocol is better organized and stable. The PICTAS communicates over USB at a 500,000 baud rate. Single byte commands are initiated from the interface. The PICTAS will respond with one or more bytes.
+Refer to the [PICTAS-Interface project](https://github.com/bigbass1997/pictas-interface-rs) for details on how to use that software. Anyone is free to make their own interface software. There will be docs provided here once the communication protocol has stablized. The PICTAS communicates over USB at a 500,000 baud rate. Single byte commands are initiated from the interface. The PICTAS will respond with one or more bytes.
 
-Because the input data is saved onto the device, you will _not_ need to reprogram it again unless you wish to change the TAS inputs.
+Because the input data is saved onto the device, you will _not_ need to reprogram it again unless you wish to change the TAS inputs or other configuration data.
 
 ### Flash Memory Map
 ```
@@ -34,9 +32,11 @@ Each command is made up of a 3 byte wide number, which specifies the frame numbe
 ```
 
 ### Input Displays
-This replay device also supports input displays (aka viz boards), which enable the viewers to see which inputs are being pressed in real time, using LEDs, a shift register, and a current driver.
+This replay device also supports input displays (aka viz/visualization boards), providing the viewers a way see which inputs are being pressed in real time.
 
-The displays are designed to be placed on a SPI bus, which each display board shares the same clock and serial signals. Each device uses it's own Chip Select signal as a data latch.
+The displays are designed to be placed on a SPI bus, where each display board shares the same clock and serial signals. Each device uses it's own Chip Select signal as a data latch.
+
+An auxilary power supply must be connected for these displays. The PCB design is rated for a maximum of 2Amps.
 
 ### Discord/Support
 If you have questions or suggestions, you can find me on the [N64brew Discord server](https://discord.gg/WqFgNWf) or the [TASBot server](https://discord.tas.bot/).
