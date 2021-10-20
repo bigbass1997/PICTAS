@@ -36,6 +36,16 @@
     clrf    FLASH_LAST_HIGH
     clrf    FLASH_LAST_MID
     clrf    FLASH_LAST_LOW
+    movlw   H'01'
+    movwf   MCUCMD_HOST
+    movlw   H'D0'
+    movwf   MCUCMD_SHOW8_0
+    movlw   H'D1'
+    movwf   MCUCMD_SHOW8_1
+    movlw   H'D2'
+    movwf   MCUCMD_SHOW8_2
+    movlw   H'D3'
+    movwf   MCUCMD_SHOW8_3
     
     ; configure I/O ports ; refer to pinout spreadsheet/docs for how these are mapped
     
@@ -114,8 +124,8 @@
                             ; MODE is 0000 by default, which sets UART to Async 8-bit
     bcf     U1CON0, U1BRGS  ; normal baud rate formula
     clrf    U1BRGH
-    movlw   D'7'
-    movwf   U1BRGL          ; set baud rate to 1,000,000
+    movlw   D'1'
+    movwf   U1BRGL          ; set baud rate to 2,000,000
     bsf     U1CON1, U1ON    ; enable UART1
     
     wait D'16'

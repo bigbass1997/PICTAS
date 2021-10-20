@@ -220,7 +220,7 @@
     (pin "2" (uuid caf0383b-94a0-4319-bc4f-9f4c22b567ae))
   )
 
-  (symbol (lib_id "TPS2115APWR:TPS2115APWR") (at 133.985 86.36 0)
+  (symbol (lib_id "TPS2115APWR:TPS2115APWR") (at 133.985 86.36 0) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid 00000000-0000-0000-0000-00006056fdd3)
     (property "Reference" "U6" (id 0) (at 145.415 76.5302 0)

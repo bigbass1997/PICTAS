@@ -1,6 +1,8 @@
     movlb   B'00000000' ; sets current GPR bank to bank 0
     
-    lfsr    2, 0x00 ; sets access bank start location to 0x00
+    lfsr    0, H'0100'	; FIFO write pointer
+    lfsr    1, H'0100'	; FIFO read pointer
+    lfsr    2, H'0000'	; sets access bank start location to 0x00
     
     
     ; === Peripheral Pin Select ===
@@ -88,8 +90,8 @@
                             ; MODE is 0000 by default, which sets UART to Async 8-bit
     bcf     U2CON0, U2BRGS  ; normal baud rate formula
     clrf    U2BRGH
-    movlw   D'7'
-    movwf   U2BRGL          ; set baud rate to 500,000
+    movlw   D'1'
+    movwf   U2BRGL          ; set baud rate to 2,000,000
     bsf     U2CON1, U2ON    ; enable UART2
     
     wait D'16'
@@ -104,9 +106,6 @@
     bsf	    PIE3, U1RXIE    ; UART1 RX Interrupt enabled (high priority)
     bcf	    IPR6, U2RXIP
     bsf	    PIE6, U2RXIE    ; UART2 RX Interrupt enabled (low priority)
-    ;bcf	    PIR1, INT0IF
-    ;bsf	    IPR1, INT0IP
-    ;bsf	    PIE1, INT0IE    ; External INT0 enabled
     
     BANKSEL INTCON0
     bsf	    INTCON0, GIEL    ; Global Low-Priority Interrupt Enable bit

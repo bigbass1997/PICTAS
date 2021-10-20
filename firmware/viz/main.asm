@@ -32,16 +32,13 @@ U2RXVec	    code	0x006C	; (0x0008 + (2 * 50))
 #define	    PIN_STROBE1		LATA,  3
 #define	    PIN_STROBE0		LATA,  2
 
-#define	    PIN_UART_HOST	PORTB, 3
-
 ; === REGISTERS ===
 ; ACCESS BANK  (0x00 - 0x5F)
 ZEROS_REG       equ H'00' ; Always 0x00
 ONES_REG        equ H'01' ; Always 0xFF
 
 UTIL_FLAGS      equ H'02' ; Utility Flags, initalized with 0x00
-; <7> If set, a TAS replay is in progress
-; <6:0> Unused
+; <7:0> Unused
 
 ; Pause Clock
 PAUSE_REG_0     equ H'03'
@@ -58,23 +55,26 @@ LOOP_COUNT_1    equ H'0A'
 
 ; 0x0B - 0x5E unused
 
-JUNK_REG        equ H'5F'
+TEMP_REG        equ H'5F'
 
 ; BANK 0  (0x60 - 0xFF)
 ; Unused
 
 ; BANK 1
-; This bank is used for buffering 256 bytes of data
+; MCU-Play FIFO Buffer
+; Data received from MCU-Play will be stored here.
+; FIFO is naive. It has a pointer and a size.
+; If size > 255, it will wrap to zero. Buffer should never be this large though.
 
 
 ; === CONSTANT BYTES ===
-USB_CMD_PING        equ H'01'
-USB_CMD_DUMP        equ H'02'
-USB_CMD_RUN_N64     equ H'03'
-USB_CMD_RUN_NES     equ H'04'
-USB_CMD_DET_NES	    equ H'05'
-USB_CMD_WRITE       equ H'AA'
+MCUCMD_HOST	equ H'01'   ; Send the next byte to host
 
+MCUCMD_SHOW8_BASE   equ H'D0'
+MCUCMD_SHOW8_0	equ H'D0'   ; Send the next byte to SPI bus and strobe #0
+MCUCMD_SHOW8_1	equ H'D1'   ; Send the next byte to SPI bus and strobe #1
+MCUCMD_SHOW8_2	equ H'D2'   ; Send the next byte to SPI bus and strobe #2
+MCUCMD_SHOW8_3	equ H'D3'   ; Send the next byte to SPI bus and strobe #3
 
 ; === SUBROUTINE & MACRO INCLUDES === ;
     include "macros.inc"
@@ -106,6 +106,7 @@ Setup:
     
 ;;;;;====================== MAIN LOOP ======================;;;;;
 Start:
+    include "cmd-buffer.inc"
     
     goto    Start
     
@@ -115,12 +116,8 @@ Start:
 U1RXISR	    code	0x0200	; Byte recieved from USB  (high priority)
     BANKSEL PIR3
 U1RXISR_Retry:
-    
-    ; TODO: Handle USB commands
-    ;movffl  U1RXB, U1TXB ; temporary debug code, returns recieved byte back to host
     movffl  U1RXB, U2TXB ; relay bytes to MCU_Play
     
-    wait D'32'
     btfsc   PIR3, U1RXIF
     goto    U1RXISR_Retry
     
@@ -129,31 +126,17 @@ U1RXISR_Retry:
 U2RXISR	    code	0x0400	; Byte recieved from MCU_Play  (low priority)
     BANKSEL PIR6
 U2RXISR_Retry:
-    btfsc   PIN_UART_HOST
-    goto    U2RXISR_SendToHost
+    movffl  U2RXB, POSTINC0
+    movlw   D'1'
+    movwf   FSR0H
     
-    movffl  U2RXB, WREG
-    XORLW   H'FF'
-    call    WriteSPI_BUS0
-    
-    setf    PAUSE_REG_0
-    call    Pause2D
-    
-    movffl  U2RXB, WREG
-    XORLW   H'FF'
-    call    WriteSPI_BUS1
-    
-    goto    U2RXISR_EndTry
-    
-U2RXISR_SendToHost:
-    movffl  U2RXB, U1TXB
-    
-U2RXISR_EndTry:
-    
-    wait D'12'
     btfsc   PIR6, U2RXIF
     goto    U2RXISR_Retry
     
-    retfie  1
+    bsf	    SHADCON, SHADLO
+    movffl  WREG_SHAD, WREG
+    bcf	    SHADCON, SHADLO
+    movlb   B'000000'
+    retfie  0
     
     end

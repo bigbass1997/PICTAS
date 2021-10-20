@@ -39,6 +39,11 @@ ListenUSBCommands:
     goto    USBRX_RunMan_NES
     movf    JUNK_REG, 0
     
+    xorlw   USB_CMD_RUN_A2600
+    btfsc   STATUS, Z
+    goto    USBRX_Run_A2600
+    movf    JUNK_REG, 0
+    
     xorlw   USB_CMD_PROGTAS
     btfsc   STATUS, Z
     goto    USBRX_ProgTas
@@ -50,14 +55,20 @@ ListenUSBCommands:
     movf    JUNK_REG, 0
     
     
+    movffl  MCUCMD_HOST, U1TXB
     movlw   H'FF'
     movffl  WREG, U1TXB
     goto    ListenUSBCommands
     
     ;;;;==================================================================;;;;
 USBRX_Ping: ; 0x01
+    movffl  MCUCMD_HOST, U1TXB
     movlw   H'EE'
     movffl  WREG, U1TXB
+    
+    call    PauseInterUART
+    call    PauseInterUART
+    
     goto    ListenUSBCommands
     
     ;;;;==================================================================;;;;
@@ -71,11 +82,12 @@ USBRX_Dump: ; 0x02 ; This will dump the entire FLASH memory back to host, via US
     clrf    FLASH_ADDR_LOW
     
 USBRX_Dump_Loop:
+    movffl  MCUCMD_HOST, U1TXB
     call    FlashReadNext
     movffl  WREG, U1TXB
-    ;wait here
-    wait D'255'
-    wait D'63'
+    
+    call    PauseInterUART
+    call    PauseInterUART
     
     infsnz  FLASH_ADDR_LOW
     goto    USBRX_Dump_IncLow
@@ -98,23 +110,39 @@ USBRX_Dump_End:
     
     ;;;;==================================================================;;;;
 USBRX_Run_N64: ; 0x03
+    movffl  MCUCMD_HOST, U1TXB
     movlw   H'DD'
     movffl  WREG, U1TXB
+    call    PauseInterUART
+    call    PauseInterUART
+    
     goto    N64Main
     
 USBRX_Run_NES: ; 0x04
+    movffl  MCUCMD_HOST, U1TXB
     movlw   H'DD'
     movffl  WREG, U1TXB
+    call    PauseInterUART
+    call    PauseInterUART
+    
     goto    NESMain
     
 USBRX_RunED_NES: ; 0x05
+    movffl  MCUCMD_HOST, U1TXB
     movlw   H'DD'
     movffl  WREG, U1TXB
+    call    PauseInterUART
+    call    PauseInterUART
+    
     goto    NESMain_EverdriveStart
     
 USBRX_RunRst_NES: ; 0x06
+    movffl  MCUCMD_HOST, U1TXB
     movlw   H'DD'
     movffl  WREG, U1TXB
+    call    PauseInterUART
+    call    PauseInterUART
+    
     bsf	    PIN_CON_RESET
     wait D'255'
     wait D'255'
@@ -124,10 +152,24 @@ USBRX_RunRst_NES: ; 0x06
     goto    NESMain
     
 USBRX_RunMan_NES: ; 0x07
+    movffl  MCUCMD_HOST, U1TXB
     movlw   H'DD'
     movffl  WREG, U1TXB
+    call    PauseInterUART
+    call    PauseInterUART
+    
     call    WaitResetNES
     goto    NESMain
+    
+    ;;;;==================================================================;;;;
+USBRX_Run_A2600: ; 0x08
+    movffl  MCUCMD_HOST, U1TXB
+    movlw   H'DD'
+    movffl  WREG, U1TXB
+    call    PauseInterUART
+    call    PauseInterUART
+    
+    goto    A2600Main
     
     ;;;;==================================================================;;;;
 USBRX_ProgTas: ; 0xAA
@@ -145,6 +187,7 @@ USBRX_ProgTas_SectorLoop:
 USBRX_ProgTas_PageLoop:
     
     lfsr    1, H'0100'
+    movffl  MCUCMD_HOST, U1TXB
     movlw   H'01'
     movffl  WREG, U1TXB ; Ask if another page available
     movlw   0
@@ -155,7 +198,11 @@ USBRX_ProgTas_PageLoop:
     
 USBRX_ProgTas_ByteLoop:
     call    GrabNextUSBRX
+    movffl  MCUCMD_HOST, U1TXB
     movffl  WREG, U1TXB
+    call    PauseInterUART
+    call    PauseInterUART
+    
     movffl  WREG, POSTINC1
     tstfsz  FSR1L   ; skip next if FSR1L == zero
     goto    USBRX_ProgTas_ByteLoop
@@ -201,8 +248,12 @@ USBRX_ProgCfg: ; 0xAB
 USBRX_ProgCfg_PageLoop:
     
     lfsr    1, H'0100'
+    movffl  MCUCMD_HOST, U1TXB
     movlw   H'01'
     movffl  WREG, U1TXB ; Ask if another page available
+    call    PauseInterUART
+    call    PauseInterUART
+    
     movlw   0
     call    GrabNextUSBRX
     xorlw   H'01'
@@ -211,7 +262,11 @@ USBRX_ProgCfg_PageLoop:
     
 USBRX_ProgCfg_ByteLoop:
     call    GrabNextUSBRX
+    movffl  MCUCMD_HOST, U1TXB
     movffl  WREG, U1TXB
+    call    PauseInterUART
+    call    PauseInterUART
+    
     movffl  WREG, POSTINC1
     tstfsz  FSR1L   ; skip next if FSR1L == zero
     goto    USBRX_ProgCfg_ByteLoop
@@ -227,6 +282,7 @@ USBRX_ProgCfg_ByteLoop:
     goto    USBRX_ProgCfg_PageLoop
     ; if 16 pages have been written, then config sector programming is complete
     
+    movffl  MCUCMD_HOST, U1TXB
     movlw   H'DD'
     movffl  WREG, U1TXB ; Send OK
     

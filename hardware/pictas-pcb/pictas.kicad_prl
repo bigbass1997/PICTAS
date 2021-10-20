@@ -71,6 +71,31 @@
     "version": 3
   },
   "project": {
-    "files": []
+    "files": [
+      {
+        "name": "pictas.kicad_sch",
+        "open": true,
+        "window": {
+          "display": 1,
+          "maximized": true,
+          "pos_x": 3200,
+          "pos_y": 0,
+          "size_x": 1440,
+          "size_y": 660
+        }
+      },
+      {
+        "name": "pictas.kicad_pcb",
+        "open": true,
+        "window": {
+          "display": 0,
+          "maximized": true,
+          "pos_x": 0,
+          "pos_y": 62,
+          "size_x": 1920,
+          "size_y": 753
+        }
+      }
+    ]
   }
 }

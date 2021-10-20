@@ -1,7 +1,7 @@
 ; uses PAUSE_REG_0 and PAUSE_REG_1 to set the intervals of each loop
 ; cycles = ((PAUSE_REG_0 * 3) - 1) + ?
 Pause2D:
-    BANKSEL PAUSE_REG_0
+    movlb   B'000000'
     movff   PAUSE_REG_0, PAUSE_TMP_0
     movff   PAUSE_REG_1, PAUSE_TMP_1
     
@@ -17,10 +17,21 @@ Pause2D_FirstLoop:
     
     return
     
+
+PauseInterUART:
+    movlb   B'000000'
+    movlw   D'26'
+    movwf   PAUSE_TMP_0
+    
+PauseInterUART_Loop:
+    decfsz  PAUSE_TMP_0
+    goto    PauseInterUART_Loop
+    
+    return
     
 ; macro used for the following WriteSPI subroutines
-WriteSPI_BUSx macro strobe_port, strobe_bit
-    movffl  WREG, SPI1TXB
+WriteSPI_BUSx macro src, strobe_port, strobe_bit
+    movffl  src, SPI1TXB
     wait D'24'
     bsf	    strobe_port, strobe_bit
     bcf	    strobe_port, strobe_bit
@@ -28,22 +39,22 @@ WriteSPI_BUSx macro strobe_port, strobe_bit
     
 ; Writes WREG to SPI bus and strobes port 0
 WriteSPI_BUS0:
-    WriteSPI_BUSx   PIN_STROBE0
+    WriteSPI_BUSx   WREG, PIN_STROBE0
     return
     
 ; Writes WREG to SPI bus and strobes port 1
 WriteSPI_BUS1:
-    WriteSPI_BUSx   PIN_STROBE1
+    WriteSPI_BUSx   WREG, PIN_STROBE1
     return
     
 ; Writes WREG to SPI bus and strobes port 2
 WriteSPI_BUS2:
-    WriteSPI_BUSx   PIN_STROBE2
+    WriteSPI_BUSx   WREG, PIN_STROBE2
     return
     
 ; Writes WREG to SPI bus and strobes port 3
 WriteSPI_BUS3:
-    WriteSPI_BUSx   PIN_STROBE3
+    WriteSPI_BUSx   WREG, PIN_STROBE3
     return
     
     

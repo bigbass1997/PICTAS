@@ -9,6 +9,8 @@
     CONFIG MVECEN = ON ; Eanbles Interrupt Vector Table ; IVTBASE + 2*(vector number)
     
     CONFIG RSTOSC = HFINTOSC_64MHZ
+    CONFIG FEXTOSC = OFF
+    CONFIG CLKOUTEN = OFF
     
     CONFIG XINST = ON
     
@@ -20,11 +22,14 @@ IOCVec	    code	0x0016	; (0x0008 + (2 * 7))
     
 INT0Vec	    code	0x0018	; (0x0008 + (2 * 8))
     dw	    (0x0300>>2)
-
+    
 TMR0Vec	    code	0x0046	; (0x0008 + (2 * 31))
     dw	    (0x0500>>2)
     
-	    code	0x0600
+U1RXVec	    code	0x003E	; (0x0008 + (2 * 27))
+    dw	    (0x0600>>2)
+    
+	    code	0x0A00
 ; === Look at bottom of file for ISR routines ===
     
 ; === DEFINE PINS (text substitutions) ===
@@ -111,7 +116,14 @@ NES_STATE_REG2	equ H'21'
 NES_STATE_TMP1	equ H'22'
 NES_STATE_TMP2	equ H'23'
 
-; 0x24 - 0x57 unused
+; InterUART Protocol Constants
+MCUCMD_HOST	equ H'24'   ; init to 0x01
+MCUCMD_SHOW8_0	equ H'25'   ; init to 0xD0
+MCUCMD_SHOW8_1	equ H'26'   ; init to 0xD1
+MCUCMD_SHOW8_2	equ H'27'   ; init to 0xD2
+MCUCMD_SHOW8_3	equ H'28'   ; init to 0xD3
+
+; 0x29 - 0x57 unused
 
 CFG_EVENT_HIGH	equ H'58'
 CFG_EVENT_MID	equ H'59'
@@ -156,6 +168,7 @@ USB_CMD_RUN_NES     equ H'04'
 USB_CMD_RUNED_NES   equ H'05'
 USB_CMD_RUNRST_NES  equ H'06'
 USB_CMD_RUNMAN_NES  equ H'07'
+USB_CMD_RUN_A2600   equ H'08'
 USB_CMD_PROGTAS     equ H'AA'
 USB_CMD_PROGCFG     equ H'AB'
 
@@ -257,9 +270,6 @@ IOCISR_AF0_IncEnd:
     retfie
     
 IOCISR_AF0_ResetNotNeeded:
-    movffl  NES_STATE_REG1, U1TXB
-    movffl  NES_STATE_REG2, U1TXB
-    
     movff   NES_STATE_REG1, NES_STATE_TMP1
     movff   NES_STATE_REG2, NES_STATE_TMP2
     
@@ -402,6 +412,17 @@ TMR0ISR	    code	0x0500	;; Timer0 has completed
     call    FlashReadNextNES
     
     call    CheckResetNES
+    
+    movffl  MCUCMD_SHOW8_0, U1TXB
+    movf    NES_STATE_REG1, 0
+    xorlw   H'FF'
+    movffl  WREG, U1TXB
+    call    PauseInterUART
+    call    PauseInterUART
+    movffl  MCUCMD_SHOW8_1, U1TXB
+    movf    NES_STATE_REG2, 0
+    xorlw   H'FF'
+    movffl  WREG, U1TXB
     
     incfsz  CUR_INPUT_LOW, 1
     goto    TMR0ISR_IncEnd

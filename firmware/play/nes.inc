@@ -13,10 +13,19 @@ NESMain:
     
     movlw   H'FF'
     call    FlashReadNextNES
-    movffl  NES_STATE_REG1, U1TXB
-    movffl  NES_STATE_REG2, U1TXB
     
     call    CheckResetNES
+    
+    movffl  MCUCMD_SHOW8_0, U1TXB
+    movf    NES_STATE_REG1, 0
+    xorlw   H'FF'
+    movffl  WREG, U1TXB
+    call    PauseInterUART
+    call    PauseInterUART
+    movffl  MCUCMD_SHOW8_1, U1TXB
+    movf    NES_STATE_REG2, 0
+    xorlw   H'FF'
+    movffl  WREG, U1TXB
     
     incfsz  CUR_INPUT_LOW, 1
     goto    NESMain_IncEnd

@@ -17,6 +17,20 @@ Pause2D_FirstLoop:
     
     return
     
+    
+PauseInterUART:
+    movlb   B'000000'
+    movwf   PAUSE_TMP_1
+    movlw   D'26'
+    movwf   PAUSE_TMP_0
+    
+PauseInterUART_Loop:
+    decfsz  PAUSE_TMP_0
+    goto    PauseInterUART_Loop
+    
+    movf    PAUSE_TMP_1, 0
+    return
+    
 ; Utilizes TX_DATA register and PIN_N64_DATAOUT
 ; 'BANKSEL TX_DATA' must be run BEFORE this subroutine!
 ; Provides 3 cycles of lead time (after considering the return and next call instructions)
