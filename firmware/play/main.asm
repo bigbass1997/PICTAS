@@ -190,253 +190,43 @@ N64_BIT_CONTSTP equ B'11110011'
     
 ; Initialize device ;
 Setup:
-    include "startup.inc"
+    include "setup.inc"
     
     movlb   B'000000'
     
-;;;;;====================== Main Loop Start ======================;;;;;
-Start:
-    ;goto    NESMain  ;; if uncommented, this bypasses USB commands ; useful for testing basic controller connection
+;;;;;====================== Main Loop ======================;;;;;
+MainLoop:
     
     ; === (temporary) This included code will act as a start "menu".
     ; === (temporary) Eventually this will be replaced with a UART ISR.
     ; === (temporary) Listens for certain command bytes and reacts as directed.
     include "usb-handling.inc"
     
-    goto    Start
+    goto    MainLoop
     
     
-;;;;;====================== N64 Main Logic ======================;;;;;
+;;;;;====================== N64 Logic ======================;;;;;
     include "n64.inc"
     
     
-;;;;;====================== NES Main Logic ======================;;;;;
+;;;;;====================== NES Logic ======================;;;;;
     include "nes.inc"
     
     
-;;;;;====================== NES Main Logic ======================;;;;;
+;;;;;====================== A2600 Logic ======================;;;;;
     include "a2600.inc"
     
     
-;;;;;====================== NES Main Logic ======================;;;;;
+;;;;;====================== Genesis Logic ======================;;;;;
     include "genesis.inc"
     
     
     
-; INTERRUPT SUBROUTINES ; 
-
-; Interrupt-on-Change ISR ; Currently only used by the NES ;
-
-IOCISR	    code	0x0100	;; check all IOCxF flag bits
-    BANKSEL IOCAF
-    btfsc   IOCAF, 0
-    call    IOCISR_AF0
+; INTERRUPT SUBROUTINES ;
     
-    btfsc   IOCAF, 1
-    call    IOCISR_AF1
-    
-    btfsc   IOCAF, 3
-    call    IOCISR_AF3
-    
-    retfie
-    
-IOCISR_AF0:
-    movlb   0
-    
-    btfss   UTIL_FLAGS, 3
-    goto    IOCISR_AF0_ResetNotNeeded
-    
-    bcf	    UTIL_FLAGS, 3
-    call    ResetNES
-    
-    movlw   H'FF'
-    call    FlashReadNextNES
-    
-    call    CheckResetNES
-    
-    incfsz  CUR_INPUT_LOW, 1
-    goto    IOCISR_AF0_IncEnd
-    
-    incfsz  CUR_INPUT_MID, 1
-    goto    IOCISR_AF0_IncEnd
-    
-    incf    CUR_INPUT_HIGH, 1
-IOCISR_AF0_IncEnd:
-    
-    BANKSEL IOCAF
-    bcf	    IOCAF, 0
-    bcf	    IOCAF, 1
-    bcf	    IOCAF, 3
-    retfie
-    
-IOCISR_AF0_ResetNotNeeded:
-    movff   NES_STATE_REG1, NES_STATE_TMP1
-    movff   NES_STATE_REG2, NES_STATE_TMP2
-    
-    bsf	    STATUS, C
-    rlcf    NES_STATE_TMP1, 1
-    bsf	    PIN_NES_DATA1
-    btfss   STATUS, C
-    bcf	    PIN_NES_DATA1
-    
-    bsf	    STATUS, C
-    rlcf    NES_STATE_TMP2, 1
-    bsf	    PIN_NES_DATA2
-    btfss   STATUS, C
-    bcf	    PIN_NES_DATA2
-    
-    BANKSEL T0CON0
-    btfss   T0CON0, 7
-    bsf	    T0CON0, 7
-    
-    BANKSEL IOCAF
-    bcf	    IOCAF, 0
-    
-    return
-    
-IOCISR_AF1:
-    movlb   0
-    
-    wait D'40'	; clock filter
-    
-    bsf	    STATUS, C	; overread
-    rlcf    NES_STATE_TMP1, 1
-    bsf	    PIN_NES_DATA1
-    btfss   STATUS, C
-    bcf	    PIN_NES_DATA1
-    
-    BANKSEL IOCAF
-    bcf	    IOCAF, 1
-    return
-    
-IOCISR_AF3:
-    movlb   0
-    
-    wait D'40'	; clock filter
-    
-    bsf	    STATUS, C	; overread
-    rlcf    NES_STATE_TMP2, 1
-    bsf	    PIN_NES_DATA2
-    btfss   STATUS, C
-    bcf	    PIN_NES_DATA2
-    
-    BANKSEL IOCAF
-    bcf	    IOCAF, 3
-    return
-    
-IOCISR_End:
-    BANKSEL IOCAF
-    bcf	    IOCAF, 0
-    bcf	    IOCAF, 1
-    bcf	    IOCAF, 3
-    retfie
-    
-    
-; External Interrupt ISR ; Not used in current hardware design and is only compatible with the NES ;
-    
-INT0ISR	    code	0x0300	;; Start/stop TAS replay
-    movlb   B'000000'
-    ; The device must wait until NES_LATCH has stayed high for at least a couple seconds.
-    ; This wait period is used to indicate that the console reset button is being pressed.
-    
-    ; In the future, this can be replaced with automatic console resetting which will allow this functionality
-    ;   to become usable for other consoles (though each may operate slightly differently).
-    ; This will also hopefully replace remote starting entirely, and will rely on
-    ;   programmed configs for console selection.
-    
-INT0ISR_ButtonWait:
-    btfsc   PORTB, 5	    ; Wait for interrupt button to be released
-    goto    INT0ISR_ButtonWait
-    
-    btfsc   UTIL_FLAGS, 5
-    goto    INT0ISR_Stop
-    ; or continue to _Start
-    
-    call    WaitResetNES
-    
-    incf    STKPTR, F	    ; we want to return to NESMain, instead of where ever we were previously
-    movlw   low	    NESMain ; so we need to manipulate the STACK with a new return address
-    movwf   TOSL
-    movlw   high    NESMain
-    movwf   TOSH
-    movlw   upper   NESMain
-    movwf   TOSU
-    
-    bcf	    PIN_STAT_LED
-    BANKSEL PIR1
-    bcf	    PIR1, INT0IF
-    
-    retfie
-    
-INT0ISR_Stop:	; STOP PROCEDURE ;  ;!!!!! This should really just get replaced with a software reset !!!!!
-				    ;!!!!!    Don't think this part of the code even works *shrug*    !!!!!
-    bsf	    PIN_STAT_LED
-    bcf	    UTIL_FLAGS, 5
-    
-INT0ISR_StopWait:
-    btfsc   PORTB, 5	    ; wait for button to be released
-    goto    INT0ISR_StopWait
-    
-    setf    PAUSE_REG_0
-    clrf    PAUSE_REG_1
-    call    Pause2D
-    
-    btfsc   PORTB, 5	    ; check again in case of input bounce
-    goto    INT0ISR_StopWait
-    
-    incf    STKPTR, F	    ; we want to return to Start, instead of where ever we were previously
-    movlw   low	    Start   ; so we need to manipulate the STACK with a new return address
-    movwf   TOSL
-    movlw   high    Start
-    movwf   TOSH
-    movlw   upper   Start
-    movwf   TOSU
-    
-    
-    
-    bcf	    PIN_STAT_LED
-    BANKSEL PIR1
-    bcf	    PIR1, INT0IF
-    
-    retfie
-    
-    
-; Timer0 ISR ; Used by the NES for latch/window filtering, and loads the next frame of input ;
-    
-TMR0ISR	    code	0x0500	;; Timer0 has completed	
-    BANKSEL T0CON0
-    bcf	    T0CON0, 7	; disable timer0
-    
-    movlb   0
-    movlw   H'FF'
-    call    FlashReadNextNES
-    
-    call    CheckResetNES
-    
-    movffl  MCUCMD_SHOW8_0, U1TXB
-    movf    NES_STATE_REG1, 0
-    xorlw   H'FF'
-    movffl  WREG, U1TXB
-    call    PauseInterUART
-    call    PauseInterUART
-    movffl  MCUCMD_SHOW8_1, U1TXB
-    movf    NES_STATE_REG2, 0
-    xorlw   H'FF'
-    movffl  WREG, U1TXB
-    
-    incfsz  CUR_INPUT_LOW, 1
-    goto    TMR0ISR_IncEnd
-    
-    incfsz  CUR_INPUT_MID, 1
-    goto    TMR0ISR_IncEnd
-    
-    incf    CUR_INPUT_HIGH, 1
-TMR0ISR_IncEnd:
-    
-    
-    BANKSEL PIR3
-    bcf	    PIR3, TMR0IF
-    
-    retfie
+    include "isr.ioc.inc"
+    include "isr.int0.inc"
+    include "isr.tmr0.inc"
+    include "isr.u1rx.inc"
     
     end
