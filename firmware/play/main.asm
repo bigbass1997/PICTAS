@@ -29,7 +29,7 @@ TMR0Vec	    code	0x0046	; (0x0008 + (2 * 31))
 U1RXVec	    code	0x003E	; (0x0008 + (2 * 27))
     dw	    (0x0600>>2)
     
-	    code	0x0A00
+	    code	0x1000
 ; === Look at bottom of file for ISR routines ===
     
 ; === DEFINE PINS (text substitutions) ===
@@ -196,11 +196,6 @@ Setup:
     
 ;;;;;====================== Main Loop ======================;;;;;
 MainLoop:
-    
-    ; === (temporary) This included code will act as a start "menu".
-    ; === (temporary) Eventually this will be replaced with a UART ISR.
-    ; === (temporary) Listens for certain command bytes and reacts as directed.
-    include "usb-handling.inc"
     
     goto    MainLoop
     

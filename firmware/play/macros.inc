@@ -87,3 +87,17 @@ Increment3Registers macro high, mid, low
     incf    high, 1
     
     endm
+    
+    
+; Return to a specific label, instead of where ever we were previously
+; Manipulates the STACK with a new return address
+SetReturnPointer macro label
+    incf    STKPTR, F
+    movlw   low	    label
+    movwf   TOSL
+    movlw   high    label
+    movwf   TOSH
+    movlw   upper   label
+    movwf   TOSU
+    
+    endm

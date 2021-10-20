@@ -156,6 +156,8 @@
     ;bsf	    PIE1, INT0IE    ; External INT0 enabled
     bcf	    PIR3, TMR0IF
     bsf	    PIE3, TMR0IE    ; Timer0 Interrupt enabled
+    bcf	    PIR3, U1RXIF
+    bsf	    PIE3, U1RXIE    ; UART1RX Interrupt enabled
     BANKSEL INTCON0
     bsf	    INTCON0, GIE    ; Global Interrupt Enable bit
     
