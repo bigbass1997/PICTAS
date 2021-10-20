@@ -171,6 +171,7 @@ USB_CMD_RUNMAN_NES  equ H'07'
 USB_CMD_RUN_A2600   equ H'08'
 USB_CMD_PROGTAS     equ H'AA'
 USB_CMD_PROGCFG     equ H'AB'
+USB_CMD_RESETMCU    equ H'FE'
 
 N64_CMD_RESET       equ H'FF'
 N64_CMD_INFO        equ H'00'

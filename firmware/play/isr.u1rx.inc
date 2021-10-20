@@ -56,6 +56,11 @@ U1RXISR_Retry:
     goto    USBRX_ProgCfg
     movf    JUNK_REG, 0
     
+    xorlw   USB_CMD_RESETMCU
+    btfsc   STATUS, Z
+    goto    USBRX_ResetMCU
+    movf    JUNK_REG, 0
+    
     
     movffl  MCUCMD_HOST, U1TXB
     movlw   H'FF'
@@ -308,5 +313,18 @@ USBRX_ProgCfg_ByteLoop:
     movffl  MCUCMD_HOST, U1TXB
     movlw   H'DD'
     movffl  WREG, U1TXB ; Send OK
+    
+    goto    U1RXISR_Processed
+    
+    ;;;;==================================================================;;;;
+USBRX_ResetMCU: ; 0xFE
+    
+    movffl  MCUCMD_HOST, U1TXB
+    movlw   H'DD'
+    movffl  WREG, U1TXB
+    call    PauseInterUART
+    call    PauseInterUART
+    
+    reset
     
     goto    U1RXISR_Processed
