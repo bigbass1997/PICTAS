@@ -18,6 +18,32 @@ Pause2D_FirstLoop:
     return
     
     
+Pause3D:
+    BANKSEL PAUSE_REG_0
+    movff   PAUSE_REG_0, PAUSE_TMP_0
+    movff   PAUSE_REG_1, PAUSE_TMP_1
+    movff   PAUSE_REG_2, PAUSE_TMP_2
+    
+Pause3D_ThirdLoop:
+    movff   PAUSE_REG_1, PAUSE_TMP_1
+    
+Pause3D_SecondLoop:
+    movff   PAUSE_REG_0, PAUSE_TMP_0
+    
+Pause3D_FirstLoop:
+    decfsz  PAUSE_TMP_0
+    goto    Pause3D_FirstLoop
+    
+    decfsz  PAUSE_TMP_1
+    goto    Pause3D_SecondLoop
+    
+    decfsz  PAUSE_TMP_2
+    goto    Pause3D_ThirdLoop
+    
+    return
+    
+    
+    
 PauseInterUART:
     movlb   B'000000'
     movwf   PAUSE_TMP_1
@@ -30,6 +56,53 @@ PauseInterUART_Loop:
     
     movf    PAUSE_TMP_1, 0
     return
+
+    
+TRIS_Reset:
+    BANKSEL TRISA
+    movlw   B'11111111'
+    movwf   TRISA
+    movlw   B'11010001'
+    movwf   TRISB
+    movlw   B'00000000'
+    movwf   TRISC
+    movlw   B'11111100'
+    movwf   TRISD
+    movlw   B'00000000'
+    movwf   TRISE
+    
+    setf    LATC
+    
+    return
+    
+TRIS_NES:
+    BANKSEL TRISA
+    movlw   B'10001011'
+    movwf   TRISA
+    return
+    
+TRIS_A2600:
+    BANKSEL TRISA
+    movlw   B'10000000'
+    movwf   TRISA
+    movlw   B'00000000'
+    movwf   TRISC
+    setf    LATA
+    setf    LATC
+    
+    return
+    
+TRIS_Genesis:
+    BANKSEL TRISA
+    movlw   B'10000000'
+    movwf   TRISA
+    movlw   B'01000000'
+    movwf   TRISC
+    setf    LATA
+    setf    LATC
+    
+    return
+    
     
 ; Utilizes TX_DATA register and PIN_N64_DATAOUT
 ; 'BANKSEL TX_DATA' must be run BEFORE this subroutine!

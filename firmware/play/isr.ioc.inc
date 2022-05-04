@@ -13,7 +13,7 @@ IOCISR	    code	0x0100	;; check all IOCxF flag bits
     
     retfie
     
-IOCISR_AF0:
+IOCISR_AF0: ; LATCH occured
     movlb   0
     
     btfss   UTIL_FLAGS, 3
@@ -67,7 +67,7 @@ IOCISR_AF0_ResetNotNeeded:
     
     return
     
-IOCISR_AF1:
+IOCISR_AF1: ; Player 1 clock pulse
     movlb   0
     
     wait D'40'	; clock filter
@@ -82,7 +82,7 @@ IOCISR_AF1:
     bcf	    IOCAF, 1
     return
     
-IOCISR_AF3:
+IOCISR_AF3: ; Player 2 clock pulse
     movlb   0
     
     wait D'40'	; clock filter

@@ -166,6 +166,46 @@ FlashReadNextNES:
     call    IncrementFlashLast
     
     return
+    
+    
+;
+FlashReadNextA2600:
+    movffl  WREG, SPI1TXB
+    movffl  WREG, SPI1TXB
+    wait D'42'
+    movffl  SPI1RXB, A2600_STATE_REG1
+    nop
+    nop
+    movffl  SPI1RXB, A2600_STATE_REG2
+    nop
+    nop
+    movffl  WREG, SPI1TXB
+    wait D'15'
+    movffl  SPI1RXB, A2600_STATE_REG3
+    
+    call    IncrementFlashLast
+    call    IncrementFlashLast
+    call    IncrementFlashLast
+    
+    return
+    
+    
+;
+FlashReadNextGenesis:
+    movffl  WREG, SPI1TXB
+    movffl  WREG, SPI1TXB
+    wait D'42'
+    movffl  SPI1RXB, GEN_STATE_REG1
+    nop
+    nop
+    movffl  SPI1RXB, GEN_STATE_REG2
+    
+    call    IncrementFlashLast
+    call    IncrementFlashLast
+    
+    return
+    
+    
 ;
 FlashReadEnd:
     bsf	    PIN_FLASH_CS

@@ -73,27 +73,15 @@
   "project": {
     "files": [
       {
-        "name": "vizboard-nes.kicad_pcb",
-        "open": false,
-        "window": {
-          "display": 1,
-          "maximized": true,
-          "pos_x": 0,
-          "pos_y": 12,
-          "size_x": 1920,
-          "size_y": 577
-        }
-      },
-      {
         "name": "vizboard-nes.sch",
         "open": false,
         "window": {
-          "display": 1,
+          "display": 2,
           "maximized": true,
-          "pos_x": 240,
-          "pos_y": 162,
-          "size_x": 1440,
-          "size_y": 756
+          "pos_x": 728,
+          "pos_y": 0,
+          "size_x": 1280,
+          "size_y": 718
         }
       }
     ]

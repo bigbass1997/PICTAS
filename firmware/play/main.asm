@@ -83,7 +83,8 @@ UTIL_FLAGS      equ H'0E' ; Utility Flags, initalized with 0x00
 ; <5> If set, a TAS replay is in progress
 ; <4> Used by FlashLoadNextEvent to store previous PIN_FLASH_CS state
 ; <3> If set, reset NES on next latch
-; <2:0> Unused
+; <2> If set, A2600/Gen vsync has occured; is cleared once A2600/Gen loop has acknowledge this
+; <1:0> Unused
 
 ; Pause Clock
 PAUSE_REG_0     equ H'10'
@@ -123,7 +124,17 @@ MCUCMD_SHOW8_1	equ H'26'   ; init to 0xD1
 MCUCMD_SHOW8_2	equ H'27'   ; init to 0xD2
 MCUCMD_SHOW8_3	equ H'28'   ; init to 0xD3
 
-; 0x29 - 0x57 unused
+; A2600 Frame State Data
+A2600_STATE_REG1    equ	H'29'
+A2600_STATE_REG2    equ H'2A'
+A2600_STATE_REG3    equ H'2B'
+
+GEN_STATE_REG1	equ H'2C'
+GEN_STATE_REG2	equ H'2D'
+
+; 0x2E - 0x56 unused
+
+LAST_USB_BYTE	equ H'57'
 
 CFG_EVENT_HIGH	equ H'58'
 CFG_EVENT_MID	equ H'59'
@@ -169,9 +180,10 @@ USB_CMD_RUNED_NES   equ H'05'
 USB_CMD_RUNRST_NES  equ H'06'
 USB_CMD_RUNMAN_NES  equ H'07'
 USB_CMD_RUN_A2600   equ H'08'
+USB_CMD_RUN_GEN	    equ H'09'
 USB_CMD_PROGTAS     equ H'AA'
 USB_CMD_PROGCFG     equ H'AB'
-USB_CMD_RESETMCU    equ H'FE'
+USB_CMD_RESETMCU    equ H'AE'
 
 N64_CMD_RESET       equ H'FF'
 N64_CMD_INFO        equ H'00'
@@ -194,6 +206,7 @@ Setup:
     include "setup.inc"
     
     movlb   B'000000'
+    ;goto    GenesisMain ;;; DEBUG
     
 ;;;;;====================== Main Loop ======================;;;;;
 MainLoop:

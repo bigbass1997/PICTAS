@@ -12,8 +12,8 @@
     movlw   B'011111'
     movwf   RB3PPS      ; Set SPI1SDO   to pin RB3
     
-;    movlw   B'001101'
-;    movwf   INT0PPS	; Set INT0	to pin RB5
+    movlw   B'000111'
+    movwf   INT0PPS	; Set INT0	to pin RA7
     movlw   B'001100'
     movwf   U1RXPPS     ; Set U1RX      to pin RB4
     movlw   B'001000'
@@ -58,27 +58,31 @@
     clrf    ANSELE
     
     ; 0 is output, 1 is input
-    movlw   B'11111111'
-    movwf   TRISA
+    ;movlw   B'11111111'
+    ;movwf   TRISA
     
-    movlw   B'11010001'
-    movwf   TRISB
+    ;movlw   B'11010001'
+    ;movwf   TRISB
     
-    movlw   B'00000000'
-    movwf   TRISC
+    ;movlw   B'00000000'
+    ;movwf   TRISC
     
-    movlw   B'11110100'
-    movwf   TRISD
+    ;movlw   B'11110100'
+    ;movwf   TRISD
     
-    movlw   B'00000010'
-    movwf   TRISE
+    ;movlw   B'00000010'
+    ;movwf   TRISE
     
+    call    TRIS_Reset
+    
+    BANKSEL SLRCONB
     setf    SLRCONB
     bcf     SLRCONB, 3
     bcf     SLRCONB, 2
     bcf     SLRCONB, 1
     bcf	    SLRCONB, 0
     
+    BANKSEL LATA
     clrf    LATA
     setf    LATB
     
@@ -132,7 +136,9 @@
     
     ; === Setup Timer0 ===
     BANKSEL T0CON1
-    movlw   B'01111011'
+    movlw   B'01111011' ; (1:2048 ratio)
+    ;movlw   B'01110110' ;;; Uncomment to adjust latch filter (1:64 ratio)
+    ;movlw   B'01110111' ;;; Uncomment to adjust latch filter (1:128 ratio)
     movwf   T0CON1
     ; <7:5> sets clock source to HFINTOSC
     ;   <4> syncs timer to system clock (4 * instruction cycle clock)
@@ -140,6 +146,9 @@
 					   ; (512 / 16 =  32 microSeconds for 1 count)
     
     movlw   D'250'
+    ;movlw   D'98' ;;; Uncomment to adjust latch filter (98 counts)
+    ;movlw   D'190' ;;; Uncomment to adjust latch filter (190 counts)
+    ;movlw   D'210' ;;; Uncomment to adjust latch filter (210 counts)
     movwf   TMR0H	    ; sets timer period to 250 counts ; (250 * (32us/count) = 8ms)
     ; enable when ready to start ; bsf T0CON0, 7 ;
     
@@ -147,7 +156,7 @@
     ; === Enable Interrupts ===
     BANKSEL INTCON0
     bcf	    INTCON0, IPEN_INTCON0   ; Priority is unnecessary, make sure it's left off
-    bsf	    INTCON0, INT0EDG	    ; Set External INT0 to detect rising edge
+    bcf	    INTCON0, INT0EDG	    ; Set External INT0 to detect falling edge
     
     BANKSEL PIR0
     bcf	    PIR0, IOCIF

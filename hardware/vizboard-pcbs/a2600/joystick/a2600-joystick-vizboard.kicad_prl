@@ -71,19 +71,6 @@
     "version": 3
   },
   "project": {
-    "files": [
-      {
-        "name": "a2600-joystick-vizboard.kicad_pcb",
-        "open": false,
-        "window": {
-          "display": 1,
-          "maximized": true,
-          "pos_x": 0,
-          "pos_y": -1,
-          "size_x": 1920,
-          "size_y": 955
-        }
-      }
-    ]
+    "files": []
   }
 }

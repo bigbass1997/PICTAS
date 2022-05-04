@@ -4,7 +4,9 @@ U1RXISR_Retry:
     movlb   B'000000'
     movffl  U1RXB, JUNK_REG
     movf    JUNK_REG, 0
-    
+    ;movffl  JUNK_REG, LAST_USB_BYTE
+    ;movlw   D'4'
+    ;movwf   PAUSE_TMP_0
     
     xorlw   USB_CMD_PING
     btfsc   STATUS, Z
@@ -44,6 +46,11 @@ U1RXISR_Retry:
     xorlw   USB_CMD_RUN_A2600
     btfsc   STATUS, Z
     goto    USBRX_Run_A2600
+    movf    JUNK_REG, 0
+    
+    xorlw   USB_CMD_RUN_GEN
+    btfsc   STATUS, Z
+    goto    USBRX_Run_Genesis
     movf    JUNK_REG, 0
     
     xorlw   USB_CMD_PROGTAS
@@ -197,6 +204,17 @@ USBRX_Run_A2600: ; 0x08
     call    PauseInterUART
     
     SetReturnPointer A2600Main
+    goto    U1RXISR_Processed
+    
+    ;;;;==================================================================;;;;
+USBRX_Run_Genesis: ; 0x09
+    movffl  MCUCMD_HOST, U1TXB
+    movlw   H'DD'
+    movffl  WREG, U1TXB
+    call    PauseInterUART
+    call    PauseInterUART
+    
+    SetReturnPointer GenesisMain
     goto    U1RXISR_Processed
     
     ;;;;==================================================================;;;;

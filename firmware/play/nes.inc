@@ -52,10 +52,7 @@ NESMain_IncEnd:
     BANKSEL INTCON0
     bsf	    INTCON0, GIE    ; Re-enabling global interrupt bit
     
-    BANKSEL TRISA
-    movlw   B'10001011'
-    movwf   TRISA
-    
+    call    TRIS_NES
     
 NESMain_Loop:
     ;; loop until interrupt breaks the loop or device resets
